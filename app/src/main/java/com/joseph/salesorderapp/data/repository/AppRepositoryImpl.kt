@@ -5,6 +5,7 @@ import android.content.Context
 import com.joseph.salesorderapp.data.local.LocalDataSource
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
 import com.joseph.salesorderapp.data.remote.RemoteDataSource
+import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.LoginRequest
 import com.joseph.salesorderapp.data.remote.model.LoginResponse
 import com.joseph.salesorderapp.domain.AppRepository
@@ -27,6 +28,26 @@ class AppRepositoryImpl @Inject constructor(
             try {
                 if (context.isNetworkAvailable()) {
                     val response = remoteDataSource.login(LoginRequest(username, password))
+                    if (response.isSuccessful) {
+                        emit(Resource.Success(response.body()!!))
+                    } else {
+                        emit(Resource.Error("Login failed: ${response.code()}"))
+                    }
+                } else {
+                    emit(Resource.Error("Check internet connection"))
+                }
+
+            } catch (e: Exception) {
+                emit(Resource.Error("Exception: ${e.localizedMessage}"))
+            }
+        }
+
+    override suspend fun fetchCustomers(): Flow<Resource<CustomerResponse>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                if (context.isNetworkAvailable()) {
+                    val response = remoteDataSource.fetchCustomers()
                     if (response.isSuccessful) {
                         emit(Resource.Success(response.body()!!))
                     } else {

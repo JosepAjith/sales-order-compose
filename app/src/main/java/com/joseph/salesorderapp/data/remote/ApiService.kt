@@ -1,5 +1,6 @@
 package com.joseph.salesorderapp.data.remote
 
+import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.LoginRequest
 import com.joseph.salesorderapp.data.remote.model.LoginResponse
 import retrofit2.Response
@@ -10,4 +11,8 @@ interface ApiService {
 
     @POST("login/ananthu")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+
+    @POST("get-customers/ananthu")
+    suspend fun fetchCustomers(): Response<CustomerResponse>
+
 }
