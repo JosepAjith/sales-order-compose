@@ -13,25 +13,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.joseph.salesorderapp.data.local.dao.CustomerDao
+import com.joseph.salesorderapp.data.local.entity.CustomerEntity
+import com.joseph.salesorderapp.data.remote.model.CustomersItem
 
 @Composable
-fun CustomerItem(modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Joseph", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "TRD No: ${6575}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Phone: ${8675774607}", style = MaterialTheme.typography.bodySmall)
-            Text(
-                text = "Address: ${"Trivandrum,Technopark"}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+fun CustomerItem( customer: CustomerEntity, modifier: Modifier = Modifier) {
+    Column(modifier = Modifier.padding(12.dp)) {
+        Text(text = customer.name.toString(), style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = "Phone: ${customer.phoneNo}", style = MaterialTheme.typography.bodySmall)
+        Text(
+            text = "Address: ${customer.address}",
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }

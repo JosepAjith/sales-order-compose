@@ -2,6 +2,7 @@ package com.joseph.salesorderapp.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.joseph.salesorderapp.data.local.preferences.AppPreferences
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.Resource
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    private val appPreferences: AppPreferences,
     private val repository: AppRepository,
     private val uiEventManager: UiEventManager
 ) : ViewModel() {
@@ -63,6 +65,12 @@ class LoginViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         if (result.data?.status == 1) {
+                            appPreferences.saveBoolean(AppPreferences.KEY_IS_LOGGED_IN, true)
+                            appPreferences.saveString(
+                                AppPreferences.KEY_AUTH_TOKEN,
+                                result.data.token.toString()
+                            )
+
                             uiEventManager.showToast("Welcome!!!")
                             uiEventManager.navigate(
                                 route = "dashboard",
@@ -77,10 +85,7 @@ class LoginViewModel @Inject constructor(
 
                     is Resource.Error -> {
                         _uiState.update { it.copy(isLoading = false, error = result.message) }
-
-                        viewModelScope.launch {
-                            uiEventManager.showToast(result.message ?: "Unknown error")
-                        }
+                        uiEventManager.showToast(result.message ?: "Unknown error")
                     }
                 }
 

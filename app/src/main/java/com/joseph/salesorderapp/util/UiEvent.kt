@@ -11,4 +11,6 @@ sealed class UiEvent {
         val popUpToRoute: String? = null,
         val popUpToInclusive: Boolean = false
     ) : UiEvent()
+
+    data class CircleLoader(val message: String, val isVisible: Boolean) : UiEvent()
 }

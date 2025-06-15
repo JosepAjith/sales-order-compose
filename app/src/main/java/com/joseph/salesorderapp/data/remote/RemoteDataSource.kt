@@ -3,6 +3,7 @@ package com.joseph.salesorderapp.data.remote
 import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.LoginRequest
 import com.joseph.salesorderapp.data.remote.model.LoginResponse
+import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -13,7 +14,11 @@ class RemoteDataSource @Inject constructor(
         return apiService.login(request)
     }
 
-    suspend fun fetchCustomers(): Response<CustomerResponse> {
-        return apiService.fetchCustomers()
+    suspend fun downloadCustomers(): Response<CustomerResponse> {
+        return apiService.downloadCustomers()
+    }
+
+    suspend fun downloadProducts(): Response<ProductResponse>{
+        return apiService.downloadProducts()
     }
 }

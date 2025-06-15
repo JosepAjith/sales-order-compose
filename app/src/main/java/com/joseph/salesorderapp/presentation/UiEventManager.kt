@@ -28,9 +28,12 @@ class UiEventManager @Inject constructor() {
         _eventFlow.emit(UiEvent.Navigate(route, popUpToRoute, popUpToInclusive))
     }
 
-
     suspend fun navigateUp() {
         _eventFlow.emit(UiEvent.NavigateUp)
+    }
+
+    suspend fun showLoader(message: String, isVisible: Boolean){
+        _eventFlow.emit(UiEvent.CircleLoader(message,isVisible))
     }
 }
 

@@ -2,6 +2,7 @@ package com.joseph.salesorderapp.di
 
 import android.content.Context
 import androidx.room.Room
+import com.joseph.salesorderapp.data.local.dao.CustomerDao
 import com.joseph.salesorderapp.data.local.dao.ProductDao
 import com.joseph.salesorderapp.data.local.db.AppDatabase
 import dagger.Module
@@ -23,6 +24,9 @@ object DatabaseModule {
             AppDatabase::class.java,
             "app_database"
         ).build()
+
+    @Provides
+    fun provideCustomerDao(db: AppDatabase): CustomerDao = db.customerDao()
 
     @Provides
     fun provideProductDao(db: AppDatabase): ProductDao = db.productDao()
