@@ -15,8 +15,9 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProducts(products: List<ProductEntity>)
 
-    @Query("SELECT * FROM products")
-    fun fetchProducts(): Flow<List<ProductEntity>>
+
+    @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%' OR productCode LIKE '%' || :query || '%'  LIMIT 10")
+    fun fetchProducts(query: String): Flow<List<ProductEntity>>
 
     @Query("SELECT * FROM products WHERE id = :id")
     suspend fun getProductById(id: Int): ProductEntity?

@@ -2,14 +2,14 @@ package com.joseph.salesorderapp.presentation.sale
 
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
-import com.joseph.salesorderapp.data.remote.model.OrderItem
+import com.joseph.salesorderapp.domain.model.OrderItem
 
 data class OrderState(
     val customers: List<CustomerEntity> = emptyList(),
     val products: List<ProductEntity> = emptyList(),
     val selectedCustomer: CustomerEntity? = null,
     val selectedProduct: ProductEntity? = null,
+    val selectedPaymentMode: String? = null,
     val quantity: String = "",
     val orderItems: List<OrderItem> = emptyList(),
-    val isOrderSaved: Boolean = false
 )

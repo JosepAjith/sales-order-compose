@@ -37,7 +37,7 @@ fun DashboardCard(
 ) {
     Card(
         modifier = modifier
-            .aspectRatio(1f) // Keeps it square
+            .aspectRatio(1f)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(12.dp)

@@ -2,6 +2,7 @@ package com.joseph.salesorderapp.presentation.customer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Query
 import com.joseph.salesorderapp.data.remote.model.CustomersItem
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
@@ -26,13 +27,13 @@ class CustomerViewModel @Inject constructor(
 
     init {
 //        downloadCustomers()
-        fetchCustomers()
+        fetchCustomers("")
     }
 
-    private fun fetchCustomers() {
+    private fun fetchCustomers(query: String) {
         viewModelScope.launch {
             uiEventManager.showLoader("Loading..", true)
-            repository.fetchCustomers().collect { result ->
+            repository.fetchCustomers(query).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _uiState.update { it.copy(error = null) }

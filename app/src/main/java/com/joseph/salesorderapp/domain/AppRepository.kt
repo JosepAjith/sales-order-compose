@@ -5,6 +5,7 @@ import com.joseph.salesorderapp.data.local.entity.ProductEntity
 import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.CustomersItem
 import com.joseph.salesorderapp.data.remote.model.LoginResponse
+import com.joseph.salesorderapp.domain.model.OrderItem
 import com.joseph.salesorderapp.data.remote.model.ProductDataItem
 import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import com.joseph.salesorderapp.util.Resource
@@ -19,11 +20,14 @@ interface AppRepository {
 
     // Local Database
     suspend fun insertCustomers(customers: List<CustomersItem>)
-    suspend fun fetchCustomers(): Flow<Resource<List<CustomerEntity>>>
+    suspend fun fetchCustomers(query: String): Flow<Resource<List<CustomerEntity>>>
     suspend fun deleteAllCustomers()
 
     suspend fun insertProducts(products: List<ProductDataItem>)
-    suspend fun fetchProducts(): Flow<Resource<List<ProductEntity>>>
+    suspend fun fetchProducts(query: String): Flow<Resource<List<ProductEntity>>>
     suspend fun deleteAllProducts()
+
+    suspend fun insertOrderSummary(customer: String, totItems: Int, total: Double): Long
+    suspend fun insertOrderDetails(itemList: List<OrderItem>, orderId: Long)
 
 }

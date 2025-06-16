@@ -4,51 +4,79 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
-import com.joseph.salesorderapp.data.remote.model.OrderItem
+import com.joseph.salesorderapp.domain.model.OrderItem
 import com.joseph.salesorderapp.domain.AppRepository
+import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val repository: AppRepository,
+    private val uiEventManager: UiEventManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OrderState())
     val uiState: StateFlow<OrderState> = _uiState
 
+    private val customerSearchQuery = MutableStateFlow("")
+    private val productSearchQuery = MutableStateFlow("")
+
+    private val _requestProductFocus = MutableStateFlow(false)
+    val requestProductFocus: StateFlow<Boolean> = _requestProductFocus
+
+    private val _requestQuantityFocus = MutableStateFlow(false)
+    val requestQuantityFocus: StateFlow<Boolean> = _requestQuantityFocus
+
     init {
-        loadDropDown()
+        observeCustomerSearch()
+        observeProductSearch()
     }
 
-    private fun loadDropDown() {
+    private fun observeCustomerSearch() {
         viewModelScope.launch {
-
-            repository.fetchCustomers().collect { result ->
-                if (result is Resource.Success) {
-                    _uiState.update {
-                        it.copy(
-                            customers = result.data ?: emptyList(),
-                        )
+            customerSearchQuery
+                .debounce(150)
+                .distinctUntilChanged()
+                .flatMapLatest { query ->
+                    repository.fetchCustomers(query)
+                }
+                .collect { result ->
+                    if (result is Resource.Success) {
+                        _uiState.update { it.copy(customers = result.data ?: emptyList()) }
                     }
                 }
-            }
-
-            repository.fetchProducts().collect { result ->
-                if (result is Resource.Success) {
-                    _uiState.update {
-                        it.copy(
-                            products = result.data ?: emptyList(),
-                        )
-                    }
-                }
-            }
         }
+    }
+
+    private fun observeProductSearch() {
+        viewModelScope.launch {
+            productSearchQuery
+                .debounce(150)
+                .distinctUntilChanged()
+                .flatMapLatest { query ->
+                    repository.fetchProducts(query)
+                        .flowOn(Dispatchers.IO)
+                }
+                .collect { result ->
+                    if (result is Resource.Success) {
+                        _uiState.update { it.copy(products = result.data ?: emptyList()) }
+                    }
+                }
+        }
+    }
+
+    fun updateCustomerSearch(query: String) {
+        customerSearchQuery.value = query
+    }
+
+    fun updateProductSearch(query: String) {
+        productSearchQuery.value = query
     }
 
     fun selectCustomer(customer: CustomerEntity?) {
@@ -57,6 +85,18 @@ class OrderViewModel @Inject constructor(
 
     fun selectProduct(product: ProductEntity?) {
         _uiState.update { it.copy(selectedProduct = product) }
+        if (product != null) {
+            _requestQuantityFocus.value = true
+        }
+    }
+
+    fun selectPaymentMode(mode: String?) {
+        _uiState.update { it.copy(selectedPaymentMode = mode) }
+    }
+
+
+    fun clearRequestQuantityFocus() {
+        _requestQuantityFocus.value = false
     }
 
     fun updateQuantity(quantity: String) {
@@ -76,9 +116,28 @@ class OrderViewModel @Inject constructor(
                 quantity = ""
             )
         }
+        _requestProductFocus.value = true
+    }
+
+    fun resetProductFocusRequest() {
+        _requestProductFocus.value = false
     }
 
     fun saveOrder() {
-        _uiState.update { it.copy(isOrderSaved = true) }
+        val state = _uiState.value
+        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
+
+        viewModelScope.launch {
+            val insertedId: Long = repository.insertOrderSummary(
+                state.selectedCustomer?.name.toString(),
+                state.orderItems.size,
+                totalAmount
+            )
+
+            repository.insertOrderDetails(state.orderItems, insertedId)
+            uiEventManager.showToast("Oder saved successfully")
+            uiEventManager.navigateUp()
+        }
     }
 }
+

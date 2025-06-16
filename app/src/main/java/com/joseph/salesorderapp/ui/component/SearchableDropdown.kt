@@ -14,51 +14,51 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> SearchableDropdown(
     items: List<T>,
     selectedItem: T?,
-    onItemSelected: (T?) -> Unit, // now accepts null
+    onItemSelected: (T?) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
     itemLabel: (T) -> String,
     label: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    focusRequester: FocusRequester = FocusRequester()
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    var internalSearchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(selectedItem) {
         if (selectedItem == null) {
-            searchQuery = ""
+            internalSearchQuery = ""
+        } else {
+            expanded = false
+            internalSearchQuery = itemLabel(selectedItem)
         }
     }
 
-    // Filter based on query
-    val filteredItems = items.filter {
-        itemLabel(it).contains(searchQuery, ignoreCase = true)
-    }
-
-    // Keep text in sync with selection or typing
-    val displayText = if (expanded || selectedItem == null) searchQuery else itemLabel(selectedItem)
-
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+        onExpandedChange = { expanded = it },
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = displayText,
-            onValueChange = {
-                searchQuery = it
-                onItemSelected(null) // clear selected item when user types
-                expanded = true
+            value = internalSearchQuery,
+            onValueChange = { query ->
+                internalSearchQuery = query
+                onSearchQueryChanged(query)
+                if (!expanded) expanded = true
             },
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier
                 .menuAnchor()
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             singleLine = true
         )
 
@@ -66,18 +66,19 @@ fun <T> SearchableDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            filteredItems.forEach { item ->
+            items.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(itemLabel(item)) },
                     onClick = {
                         onItemSelected(item)
-                        searchQuery = itemLabel(item) // update visible text
-                        expanded = false
                     }
                 )
             }
         }
     }
 }
+
+
+
 
 

@@ -5,11 +5,14 @@ import android.content.Context
 import com.joseph.salesorderapp.data.local.LocalDataSource
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
 import com.joseph.salesorderapp.data.remote.RemoteDataSource
 import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.CustomersItem
 import com.joseph.salesorderapp.data.remote.model.LoginRequest
 import com.joseph.salesorderapp.data.remote.model.LoginResponse
+import com.joseph.salesorderapp.domain.model.OrderItem
 import com.joseph.salesorderapp.data.remote.model.ProductDataItem
 import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import com.joseph.salesorderapp.domain.AppRepository
@@ -50,45 +53,43 @@ class AppRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun downloadCustomers(): Flow<Resource<CustomerResponse>> =
-        flow {
-            emit(Resource.Loading())
-            try {
-                if (context.isNetworkAvailable()) {
-                    val response = remoteDataSource.downloadCustomers()
-                    if (response.isSuccessful) {
-                        emit(Resource.Success(response.body()!!))
-                    } else {
-                        emit(Resource.Error("Login failed: ${response.code()}"))
-                    }
+    override suspend fun downloadCustomers(): Flow<Resource<CustomerResponse>> = flow {
+        emit(Resource.Loading())
+        try {
+            if (context.isNetworkAvailable()) {
+                val response = remoteDataSource.downloadCustomers()
+                if (response.isSuccessful) {
+                    emit(Resource.Success(response.body()!!))
                 } else {
-                    emit(Resource.Error("Check internet connection"))
+                    emit(Resource.Error("Login failed: ${response.code()}"))
                 }
-
-            } catch (e: Exception) {
-                emit(Resource.Error("Exception: ${e.localizedMessage}"))
+            } else {
+                emit(Resource.Error("Check internet connection"))
             }
-        }
 
-    override suspend fun downloadProducts(): Flow<Resource<ProductResponse>> =
-        flow {
-            emit(Resource.Loading())
-            try {
-                if (context.isNetworkAvailable()) {
-                    val response = remoteDataSource.downloadProducts()
-                    if (response.isSuccessful) {
-                        emit(Resource.Success(response.body()!!))
-                    } else {
-                        emit(Resource.Error("Login failed: ${response.code()}"))
-                    }
+        } catch (e: Exception) {
+            emit(Resource.Error("Exception: ${e.localizedMessage}"))
+        }
+    }
+
+    override suspend fun downloadProducts(): Flow<Resource<ProductResponse>> = flow {
+        emit(Resource.Loading())
+        try {
+            if (context.isNetworkAvailable()) {
+                val response = remoteDataSource.downloadProducts()
+                if (response.isSuccessful) {
+                    emit(Resource.Success(response.body()!!))
                 } else {
-                    emit(Resource.Error("Check internet connection"))
+                    emit(Resource.Error("Login failed: ${response.code()}"))
                 }
-
-            } catch (e: Exception) {
-                emit(Resource.Error("Exception: ${e.localizedMessage}"))
+            } else {
+                emit(Resource.Error("Check internet connection"))
             }
+
+        } catch (e: Exception) {
+            emit(Resource.Error("Exception: ${e.localizedMessage}"))
         }
+    }
 
 
     //Local Database
@@ -112,12 +113,12 @@ class AppRepositoryImpl @Inject constructor(
         localDataSource.insertCustomers(customerEntities)
     }
 
-    override suspend fun fetchCustomers(): Flow<Resource<List<CustomerEntity>>> {
+    override suspend fun fetchCustomers(query: String): Flow<Resource<List<CustomerEntity>>> {
         return flow {
             emit(Resource.Loading())
             try {
                 val localCustomers =
-                    localDataSource.fetchCustomers().first() // get first item from Flow
+                    localDataSource.fetchCustomers(query).first() // get first item from Flow
                 emit(Resource.Success(localCustomers))
             } catch (e: Exception) {
                 emit(Resource.Error("Error: ${e.message}"))
@@ -156,12 +157,12 @@ class AppRepositoryImpl @Inject constructor(
         localDataSource.insertProducts(productsEntities)
     }
 
-    override suspend fun fetchProducts(): Flow<Resource<List<ProductEntity>>> {
+    override suspend fun fetchProducts(query: String): Flow<Resource<List<ProductEntity>>> {
         return flow {
             emit(Resource.Loading())
             try {
                 val localProducts =
-                    localDataSource.fetchProducts().first() // get first item from Flow
+                    localDataSource.fetchProducts(query).first() // get first item from Flow
                 emit(Resource.Success(localProducts))
             } catch (e: Exception) {
                 emit(Resource.Error("Error: ${e.message}"))
@@ -174,4 +175,34 @@ class AppRepositoryImpl @Inject constructor(
         localDataSource.deleteAllProducts()
     }
 
+
+    override suspend fun insertOrderSummary(customer: String, totItems: Int, total: Double): Long {
+        val orderSummary = OrderSummaryEntity(
+            customerName = customer,
+            totalItems = totItems,
+            totalAmount = total,
+            isSynced = false,
+            createdAt = DateUtils.getCurrentTimestamp(),
+            updatedAt = DateUtils.getCurrentTimestamp()
+        )
+
+        return localDataSource.insertOrderSummary(orderSummary)
+    }
+
+    override suspend fun insertOrderDetails(itemList: List<OrderItem>, orderId: Long) {
+        val orderItems = itemList.map {
+            OrderDetailsEntity(
+                orderId = orderId,
+                productName = it.product.name,
+                quantity = it.product.stockQty,
+                pricePerUnit = it.product.sellingPrice,
+                totalPrice = it.product.sellingPrice * it.product.stockQty,
+                isSynced = false,
+                createdAt = DateUtils.getCurrentTimestamp(),
+                updatedAt = DateUtils.getCurrentTimestamp()
+            )
+        }
+
+        localDataSource.insertOrderDetails(orderItems)
+    }
 }

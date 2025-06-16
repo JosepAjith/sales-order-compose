@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
+import com.joseph.salesorderapp.data.local.entity.ProductEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,8 +20,8 @@ interface CustomerDao {
     suspend fun insertCustomers(customers: List<CustomerEntity>)
 
     // Get all customers
-    @Query("SELECT * FROM customers")
-    fun fetchCustomers(): Flow<List<CustomerEntity>>
+    @Query("SELECT * FROM customers WHERE name LIKE '%' || :query || '%' LIMIT 10")
+    fun fetchCustomers(query: String): Flow<List<CustomerEntity>>
 
     // Get customer by ID
     @Query("SELECT * FROM customers WHERE id = :id")
