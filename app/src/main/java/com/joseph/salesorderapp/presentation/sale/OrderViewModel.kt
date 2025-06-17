@@ -90,6 +90,18 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    fun removeOrderItem(index: Int) {
+        viewModelScope.launch {
+            val updatedItems = _uiState.value.orderItems.toMutableList().apply {
+                removeAt(index)
+            }
+            _uiState.update { it.copy(orderItems = updatedItems) }
+            uiEventManager.showToast("Removed")
+        }
+
+    }
+
+
     fun selectPaymentMode(mode: String?) {
         _uiState.update { it.copy(selectedPaymentMode = mode) }
     }
@@ -135,8 +147,8 @@ class OrderViewModel @Inject constructor(
             )
 
             repository.insertOrderDetails(state.orderItems, insertedId)
-            uiEventManager.showToast("Oder saved successfully")
-            uiEventManager.navigateUp()
+            uiEventManager.showSnackbar("Oder saved successfully")
+            _uiState.value = OrderState()
         }
     }
 }

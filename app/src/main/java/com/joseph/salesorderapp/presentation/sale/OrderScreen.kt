@@ -26,8 +26,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.joseph.salesorderapp.ui.component.SearchableDropdown
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Divider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,12 +41,14 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import java.text.DecimalFormat
+import androidx.compose.material3.Icon
+
 
 @Composable
 fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsState()
-    val priceFormatter = DecimalFormat("#,##0.00")
-    val paymentModes = listOf("Cash", "Card", "Credit")
+    val priceFormatter = DecimalFormat("#,##0.000")
+    val paymentModes = listOf("Cash", "Card", "Credit", "Online", "Cash/Card")
 
     val productFocusRequester = remember { FocusRequester() }
     val quantityFocusRequester = remember { FocusRequester() }
@@ -80,6 +86,49 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Total Items
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Total Items",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = state.orderItems.size.toString(),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+
+                    // Total Amount
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Total Amount",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = priceFormatter.format(
+                                state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
+                            ),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+                }
 
                 Button(
                     onClick = viewModel::saveOrder,
@@ -98,33 +147,15 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp), // spacing below dropdowns
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SearchableDropdown(
-                    items = state.customers,
-                    selectedItem = state.selectedCustomer,
-                    onItemSelected = viewModel::selectCustomer,
-                    onSearchQueryChanged = viewModel::updateCustomerSearch,
-                    itemLabel = { it.name },
-                    label = "Customer",
-                    modifier = Modifier.weight(1f)
-                )
-
-                SearchableDropdown(
-                    items = paymentModes,
-                    selectedItem = state.selectedPaymentMode,
-                    onItemSelected = { viewModel.selectPaymentMode(it) },
-                    onSearchQueryChanged = {},
-                    itemLabel = { it },
-                    label = "Pay Mode",
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
+            SearchableDropdown(
+                items = state.customers,
+                selectedItem = state.selectedCustomer,
+                onItemSelected = viewModel::selectCustomer,
+                onSearchQueryChanged = viewModel::updateCustomerSearch,
+                itemLabel = { it.name },
+                label = "Customer",
+                modifier = Modifier.fillMaxWidth(),
+            )
             SearchableDropdown(
                 items = state.products,
                 selectedItem = state.selectedProduct,
@@ -139,7 +170,6 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
@@ -152,21 +182,27 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                         .focusRequester(quantityFocusRequester)
                 )
 
+                SearchableDropdown(
+                    items = paymentModes,
+                    selectedItem = state.selectedPaymentMode,
+                    onItemSelected = { viewModel.selectPaymentMode(it) },
+                    onSearchQueryChanged = {},
+                    itemLabel = { it },
+                    label = "Pay Mode",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
                 Button(
                     onClick = viewModel::addProductToOrder,
-                    enabled = state.selectedProduct != null && state.quantity.isNotEmpty(),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(6.dp)
+                    enabled = state.selectedProduct != null && state.quantity.isNotEmpty()
                 ) {
                     Text("Add Item")
                 }
             }
-
-
-            Spacer(Modifier.height(16.dp))
-
             Text("Order Items:", style = MaterialTheme.typography.titleMedium)
             LazyColumn {
                 itemsIndexed(state.orderItems) { index, item ->
@@ -192,7 +228,7 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                             Spacer(modifier = Modifier.width(12.dp))
 
                             // Name and details
-                            Column(modifier = Modifier.fillMaxWidth()) {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = item.product.name,
                                     style = MaterialTheme.typography.bodyMedium.copy(
@@ -217,14 +253,21 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                                     )
                                     Text(
                                         text = "Total: ${priceFormatter.format(item.quantity * item.product.sellingPrice)}",
-                                        style = totalStyle, // Highlight the total
+                                        style = totalStyle,
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
                             }
+
+                            IconButton(onClick = { viewModel.removeOrderItem(index) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Remove Item",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
 
-                        // Divider line
                         Divider(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -235,6 +278,7 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                     }
                 }
             }
+
         }
     }
 }
