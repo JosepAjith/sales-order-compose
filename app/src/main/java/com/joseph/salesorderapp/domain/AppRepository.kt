@@ -2,6 +2,7 @@ package com.joseph.salesorderapp.domain
 
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
 import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.CustomersItem
 import com.joseph.salesorderapp.data.remote.model.LoginResponse
@@ -29,5 +30,8 @@ interface AppRepository {
 
     suspend fun insertOrderSummary(customer: String, totItems: Int, total: Double): Long
     suspend fun insertOrderDetails(itemList: List<OrderItem>, orderId: Long)
+
+    suspend fun fetchOrderSummary(fromDate: String,toDate: String): Flow<Resource<List<OrderSummaryEntity>>>
+
 
 }

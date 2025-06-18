@@ -182,6 +182,7 @@ class AppRepositoryImpl @Inject constructor(
             totalItems = totItems,
             totalAmount = total,
             isSynced = false,
+            orderDate = DateUtils.getCurrentDate(),
             createdAt = DateUtils.getCurrentTimestamp(),
             updatedAt = DateUtils.getCurrentTimestamp()
         )
@@ -204,5 +205,19 @@ class AppRepositoryImpl @Inject constructor(
         }
 
         localDataSource.insertOrderDetails(orderItems)
+    }
+
+    override suspend fun fetchOrderSummary(fromDate: String,toDate: String): Flow<Resource<List<OrderSummaryEntity>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val loadSummary =
+                    localDataSource.fetchOrderSummary(fromDate,toDate).first()
+                emit(Resource.Success(loadSummary))
+            } catch (e: Exception) {
+                emit(Resource.Error("Error: ${e.message}"))
+            }
+        }
+
     }
 }

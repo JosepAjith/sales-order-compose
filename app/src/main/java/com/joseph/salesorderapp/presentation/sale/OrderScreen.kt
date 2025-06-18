@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,8 +28,10 @@ import com.joseph.salesorderapp.ui.component.SearchableDropdown
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
@@ -42,8 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import java.text.DecimalFormat
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TopAppBar
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsState()
@@ -80,6 +85,19 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    IconButton(onClick = viewModel::onBackPress) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                modifier = Modifier.padding(top = 0.dp),
+                windowInsets = WindowInsets(0)
+            )
+        },
         bottomBar = {
             Column(
                 modifier = Modifier

@@ -1,5 +1,7 @@
 package com.joseph.salesorderapp.util
 
+import java.util.Date
+
 
 sealed class UiEvent {
     data class ShowToast(val message: String) : UiEvent()
@@ -13,4 +15,9 @@ sealed class UiEvent {
     ) : UiEvent()
 
     data class CircleLoader(val message: String, val isVisible: Boolean) : UiEvent()
+
+    data class ShowDatePicker(
+        val initialDate: Date,
+        val onDateSelected: (Date) -> Unit
+    ) : UiEvent()
 }

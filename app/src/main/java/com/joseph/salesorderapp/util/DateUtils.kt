@@ -12,9 +12,14 @@ object DateUtils {
         return formatter.format(Date())
     }
 
-    // Format: 2025-06-13 (only date)
+    // Format: 13-06-2025 (only date)
     fun getCurrentDate(): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
         return formatter.format(Date())
+    }
+
+    fun formatDate(date: Date): String {
+        val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        return formatter.format(date)
     }
 }

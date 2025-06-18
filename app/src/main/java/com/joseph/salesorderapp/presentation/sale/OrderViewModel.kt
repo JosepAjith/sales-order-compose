@@ -135,6 +135,12 @@ class OrderViewModel @Inject constructor(
         _requestProductFocus.value = false
     }
 
+    fun onBackPress() {
+        viewModelScope.launch {
+            uiEventManager.navigateUp()
+        }
+    }
+
     fun saveOrder() {
         val state = _uiState.value
         val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.quantity }

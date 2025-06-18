@@ -3,6 +3,7 @@ package com.joseph.salesorderapp.presentation
 import com.joseph.salesorderapp.util.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,6 +35,13 @@ class UiEventManager @Inject constructor() {
 
     suspend fun showLoader(message: String, isVisible: Boolean){
         _eventFlow.emit(UiEvent.CircleLoader(message,isVisible))
+    }
+
+    suspend fun showDatePicker(
+        initialDate: Date,
+        onDateSelected: (Date) -> Unit
+    ) {
+        _eventFlow.emit(UiEvent.ShowDatePicker(initialDate, onDateSelected))
     }
 }
 

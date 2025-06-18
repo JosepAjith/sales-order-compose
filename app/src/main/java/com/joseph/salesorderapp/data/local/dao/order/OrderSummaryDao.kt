@@ -15,4 +15,8 @@ interface OrderSummaryDao {
 
     @Query("SELECT * FROM order_summary")
     fun fetchSummary(): Flow<List<OrderSummaryEntity>>
+
+    @Query("SELECT * FROM order_summary WHERE orderDate BETWEEN :fromDate AND :toDate")
+    fun fetchOrderSummary(fromDate: String, toDate: String): Flow<List<OrderSummaryEntity>>
+
 }

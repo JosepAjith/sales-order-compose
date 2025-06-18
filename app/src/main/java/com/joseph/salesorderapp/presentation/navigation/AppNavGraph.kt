@@ -1,5 +1,6 @@
 package com.joseph.salesorderapp.presentation.navigation
 
+import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,9 +27,11 @@ import androidx.navigation.compose.composable
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.presentation.customer.CustomerScreen
 import com.joseph.salesorderapp.presentation.dashboard.DashBoardScreen
+import com.joseph.salesorderapp.presentation.report.summary.ReportScreen
 import com.joseph.salesorderapp.presentation.sale.OrderScreen
 import com.joseph.salesorderapp.presentation.splash.SplashScreen
 import com.joseph.salesorderapp.util.UiEvent
+import java.util.Calendar
 
 @Composable
 fun AppNavGraph(
@@ -72,6 +75,25 @@ fun AppNavGraph(
                     showLoader = event.isVisible
                     loaderMessage = event.message
                 }
+
+                is UiEvent.ShowDatePicker -> {
+                    val calendar = Calendar.getInstance().apply {
+                        time = event.initialDate
+                    }
+
+                    DatePickerDialog(
+                        context,
+                        { _, year, month, dayOfMonth ->
+                            val selected = Calendar.getInstance().apply {
+                                set(year, month, dayOfMonth)
+                            }.time
+                            event.onDateSelected(selected)
+                        },
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                    ).show()
+                }
             }
         }
     }
@@ -89,6 +111,7 @@ fun AppNavGraph(
             composable(Routes.Dashboard.route) { DashBoardScreen() }
             composable(Routes.CustomerList.route) { CustomerScreen() }
             composable(Routes.SaleOrder.route) { OrderScreen() }
+            composable(Routes.Report.route) { ReportScreen() }
         }
     }
 
