@@ -8,4 +8,8 @@ sealed class Routes(val route: String) {
     object AddCustomer : Routes("add_customer")
     object SaleOrder : Routes("sale_order")
     object Report : Routes("report")
+    object ReportDetails : Routes("report_details/{orderId}") {
+        fun createRoute(orderId: Int): String = "report_details/$orderId"
+    }
+
 }

@@ -232,7 +232,6 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Serial Number
                             Text(
                                 text = "${index + 1}",
                                 modifier = Modifier.width(24.dp),

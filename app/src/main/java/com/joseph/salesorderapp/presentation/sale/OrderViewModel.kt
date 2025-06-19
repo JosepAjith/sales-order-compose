@@ -143,13 +143,14 @@ class OrderViewModel @Inject constructor(
 
     fun saveOrder() {
         val state = _uiState.value
-        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
+        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.product.stockQty }
 
         viewModelScope.launch {
             val insertedId: Long = repository.insertOrderSummary(
                 state.selectedCustomer?.name.toString(),
                 state.orderItems.size,
-                totalAmount
+                totalAmount,
+                state.selectedPaymentMode.toString()
             )
 
             repository.insertOrderDetails(state.orderItems, insertedId)

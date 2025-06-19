@@ -2,6 +2,7 @@ package com.joseph.salesorderapp.domain
 
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
 import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
 import com.joseph.salesorderapp.data.remote.model.CustomerResponse
 import com.joseph.salesorderapp.data.remote.model.CustomersItem
@@ -28,10 +29,23 @@ interface AppRepository {
     suspend fun fetchProducts(query: String): Flow<Resource<List<ProductEntity>>>
     suspend fun deleteAllProducts()
 
-    suspend fun insertOrderSummary(customer: String, totItems: Int, total: Double): Long
+    suspend fun insertOrderSummary(
+        customer: String,
+        totItems: Int,
+        total: Double,
+        paymentMode: String
+    ): Long
+
     suspend fun insertOrderDetails(itemList: List<OrderItem>, orderId: Long)
 
-    suspend fun fetchOrderSummary(fromDate: String,toDate: String): Flow<Resource<List<OrderSummaryEntity>>>
+    suspend fun fetchOrderSummary(
+        fromDate: String,
+        toDate: String
+    ): Flow<Resource<List<OrderSummaryEntity>>>
+
+    suspend fun fetchOrderSummaryById(orderId: Int): Flow<Resource<OrderSummaryEntity>>
+
+    suspend fun fetchReportItemList(orderId: Int): Flow<Resource<List<OrderDetailsEntity>>>
 
 
 }

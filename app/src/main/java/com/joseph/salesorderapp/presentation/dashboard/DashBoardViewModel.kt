@@ -22,6 +22,22 @@ class DashBoardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DashBoardState())
     val uiState: StateFlow<DashBoardState> = _uiState.asStateFlow()
 
+    init {
+        loadUnsyncedCounts()
+    }
+
+    fun loadUnsyncedCounts() {
+        viewModelScope.launch {
+            val unsyncedCustomers = repository.getUnsyncedCustomers()
+            val unsyncedOrders = repository.getUnsyncedOrders()
+            _uiState.update {
+                it.copy(
+                    unsyncedCustomersCount = unsyncedCustomers.size,
+                    unsyncedOrdersCount = unsyncedOrders.size
+                )
+            }
+        }
+    }
 
     fun onCardClicked(route: String) {
         val state = _uiState.value

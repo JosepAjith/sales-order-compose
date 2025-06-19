@@ -176,12 +176,18 @@ class AppRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun insertOrderSummary(customer: String, totItems: Int, total: Double): Long {
+    override suspend fun insertOrderSummary(
+        customer: String,
+        totItems: Int,
+        total: Double,
+        paymentMode: String
+    ): Long {
         val orderSummary = OrderSummaryEntity(
             customerName = customer,
             totalItems = totItems,
             totalAmount = total,
             isSynced = false,
+            paymentMode = paymentMode,
             orderDate = DateUtils.getCurrentDate(),
             createdAt = DateUtils.getCurrentTimestamp(),
             updatedAt = DateUtils.getCurrentTimestamp()
@@ -207,12 +213,15 @@ class AppRepositoryImpl @Inject constructor(
         localDataSource.insertOrderDetails(orderItems)
     }
 
-    override suspend fun fetchOrderSummary(fromDate: String,toDate: String): Flow<Resource<List<OrderSummaryEntity>>> {
+    override suspend fun fetchOrderSummary(
+        fromDate: String,
+        toDate: String
+    ): Flow<Resource<List<OrderSummaryEntity>>> {
         return flow {
             emit(Resource.Loading())
             try {
                 val loadSummary =
-                    localDataSource.fetchOrderSummary(fromDate,toDate).first()
+                    localDataSource.fetchOrderSummary(fromDate, toDate).first()
                 emit(Resource.Success(loadSummary))
             } catch (e: Exception) {
                 emit(Resource.Error("Error: ${e.message}"))
@@ -220,4 +229,38 @@ class AppRepositoryImpl @Inject constructor(
         }
 
     }
+
+    override suspend fun fetchOrderSummaryById(
+        orderId: Int
+    ): Flow<Resource<OrderSummaryEntity>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val orderSummary = localDataSource.fetchOrderSummaryById(orderId).first()
+                if (orderSummary != null) {
+                    emit(Resource.Success(orderSummary))
+                } else {
+                    emit(Resource.Error("Order not found"))
+                }
+            } catch (e: Exception) {
+                emit(Resource.Error("Error: ${e.message}"))
+            }
+        }
+    }
+
+
+    override suspend fun fetchReportItemList(orderId: Int): Flow<Resource<List<OrderDetailsEntity>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val orderItems =
+                    localDataSource.fetchReportItemList(orderId).first()
+                emit(Resource.Success(orderItems))
+            } catch (e: Exception) {
+                emit(Resource.Error("Error: ${e.message}"))
+            }
+        }
+    }
+
+
 }

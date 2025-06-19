@@ -22,16 +22,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.presentation.customer.CustomerScreen
 import com.joseph.salesorderapp.presentation.dashboard.DashBoardScreen
+import com.joseph.salesorderapp.presentation.report.details.ReportDetailScreen
 import com.joseph.salesorderapp.presentation.report.summary.ReportScreen
 import com.joseph.salesorderapp.presentation.sale.OrderScreen
 import com.joseph.salesorderapp.presentation.splash.SplashScreen
 import com.joseph.salesorderapp.util.UiEvent
 import java.util.Calendar
+
+
 
 @Composable
 fun AppNavGraph(
@@ -112,6 +117,14 @@ fun AppNavGraph(
             composable(Routes.CustomerList.route) { CustomerScreen() }
             composable(Routes.SaleOrder.route) { OrderScreen() }
             composable(Routes.Report.route) { ReportScreen() }
+            composable(
+                route = Routes.ReportDetails.route,
+                arguments = listOf(navArgument("orderId") { type = NavType.IntType })
+            ) {
+                ReportDetailScreen()
+            }
+
+
         }
     }
 

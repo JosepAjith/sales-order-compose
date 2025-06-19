@@ -1,5 +1,6 @@
 package com.joseph.salesorderapp.presentation.report.summary
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -142,6 +143,7 @@ fun ReportScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clickable { viewModel.onOrderClicked(order.id) }
                             .padding( vertical = 8.dp)
                     ) {
                         Row(

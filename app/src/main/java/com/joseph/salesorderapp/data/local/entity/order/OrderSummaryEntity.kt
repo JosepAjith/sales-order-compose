@@ -10,6 +10,7 @@ data class OrderSummaryEntity(
     val totalItems: Int,
     val totalAmount: Double,
     val orderDate: String,
+    val paymentMode: String,
     val isSynced: Boolean = false,
     val createdAt: String? = null,
     val updatedAt: String? = null

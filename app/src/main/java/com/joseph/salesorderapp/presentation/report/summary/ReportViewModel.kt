@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
+import com.joseph.salesorderapp.presentation.navigation.Routes
 import com.joseph.salesorderapp.util.DateUtils
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -103,7 +104,13 @@ class ReportViewModel @Inject constructor(
 
     fun searchOrders() {
         viewModelScope.launch {
-         loadOrders()
+            loadOrders()
+        }
+    }
+
+    fun onOrderClicked(orderId: Int) {
+        viewModelScope.launch {
+            uiEventManager.navigate(route = Routes.ReportDetails.createRoute(orderId))
         }
     }
 

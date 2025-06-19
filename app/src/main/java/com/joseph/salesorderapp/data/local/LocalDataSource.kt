@@ -54,4 +54,13 @@ class LocalDataSource @Inject constructor(
         return orderSummaryDao.fetchOrderSummary(fromDate, toDate)
     }
 
+    fun fetchOrderSummaryById(orderID: Int): Flow<OrderSummaryEntity?> {
+        return orderSummaryDao.fetchOrderSummaryById(orderID)
+
+    }
+
+    fun fetchReportItemList(orderID: Int): Flow<List<OrderDetailsEntity>> {
+        return orderDetailsDao.fetchReportItemList(orderID)
+    }
+
 }

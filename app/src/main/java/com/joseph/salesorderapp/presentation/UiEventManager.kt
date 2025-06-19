@@ -33,8 +33,8 @@ class UiEventManager @Inject constructor() {
         _eventFlow.emit(UiEvent.NavigateUp)
     }
 
-    suspend fun showLoader(message: String, isVisible: Boolean){
-        _eventFlow.emit(UiEvent.CircleLoader(message,isVisible))
+    suspend fun showLoader(message: String, isVisible: Boolean) {
+        _eventFlow.emit(UiEvent.CircleLoader(message, isVisible))
     }
 
     suspend fun showDatePicker(

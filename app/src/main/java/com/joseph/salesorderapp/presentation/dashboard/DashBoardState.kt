@@ -9,4 +9,7 @@ data class DashBoardState(
     val success: Boolean = false,
     val customers: List<CustomersItem> = emptyList(),
     val products: List<ProductDataItem> = emptyList()
+    val unsyncedCustomersCount: Int = 0,
+    val unsyncedOrdersCount: Int = 0,
+    val isSyncing: Boolean = false
 )
