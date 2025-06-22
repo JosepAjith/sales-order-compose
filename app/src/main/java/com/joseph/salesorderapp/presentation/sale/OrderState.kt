@@ -12,4 +12,5 @@ data class OrderState(
     val selectedPaymentMode: String? = null,
     val quantity: String = "",
     val orderItems: List<OrderItem> = emptyList(),
+    val message: String = "",
 )

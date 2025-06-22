@@ -23,11 +23,16 @@ interface OrderSummaryDao {
     @Query("SELECT * FROM order_summary WHERE id = :orderID LIMIT 1")
     fun fetchOrderSummaryById(orderID: Int): Flow<OrderSummaryEntity?>
 
-    @Query("SELECT * FROM order_summary WHERE isSynced = 0")
-    suspend fun getUnsyncedOrders(): List<OrderSummaryEntity>
-
     @Update
     suspend fun updateOrders(orders: List<OrderSummaryEntity>)
 
+    @Query("SELECT COUNT(*) FROM order_summary WHERE isSynced = 0")
+    suspend fun getUnsyncedOrdersCount(): Int
+
+    @Query("SELECT * FROM order_summary WHERE isSynced = 0")
+    fun getUnsyncedOrderEntities(): Flow<List<OrderSummaryEntity>>
+
+    @Query("UPDATE order_summary SET isSynced = 1 WHERE id = :orderId")
+    suspend fun updateOrderSynced(orderId: Long)
 
 }

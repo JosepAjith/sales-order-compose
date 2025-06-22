@@ -26,7 +26,6 @@ class CustomerViewModel @Inject constructor(
     val uiState: StateFlow<CustomerState> = _uiState.asStateFlow()
 
     init {
-//        downloadCustomers()
         fetchCustomers("")
     }
 
@@ -60,42 +59,16 @@ class CustomerViewModel @Inject constructor(
         }
     }
 
+    fun onFabClicked() {
+        viewModelScope.launch {
+            uiEventManager.navigate(route = "add_customer")
+        }
+    }
 
-//    fun downloadCustomers() {
-//        viewModelScope.launch {
-//            repository.fetchCustomers().collect { result ->
-//                when (result) {
-//                    is Resource.Loading -> {
-//                        _uiState.update { it.copy(isLoading = true, error = null) }
-//                    }
-//
-//                    is Resource.Success -> {
-//                        if (result.data?.status == 1) {
-//                            val customerList = result.data.customers?.filterNotNull() ?: emptyList()
-//                            _uiState.update {
-//                                it.copy(
-//                                    isLoading = false,
-//                                    customers = customerList,
-//                                    error = null,
-//                                    success = true
-//                                )
-//                            }
-//                        } else {
-//                            _uiState.update { it.copy(isLoading = false, error = result.message) }
-//                            uiEventManager.showToast(result.data?.message.toString())
-//                        }
-//                    }
-//
-//                    is Resource.Error -> {
-//                        _uiState.update { it.copy(isLoading = false, error = result.message) }
-//                        viewModelScope.launch {
-//                            uiEventManager.showToast(result.message ?: "Unknown error")
-//                        }
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
+    fun onBackPress() {
+        viewModelScope.launch {
+            uiEventManager.navigateUp()
+        }
+    }
 
 }

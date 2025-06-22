@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.joseph.salesorderapp.data.local.dao.CustomerDao
 import com.joseph.salesorderapp.data.local.dao.ProductDao
+import com.joseph.salesorderapp.data.local.dao.UserDao
 import com.joseph.salesorderapp.data.local.dao.order.OrderDetailsDao
 import com.joseph.salesorderapp.data.local.dao.order.OrderSummaryDao
 import com.joseph.salesorderapp.data.local.db.AppDatabase
@@ -38,4 +39,7 @@ object DatabaseModule {
 
     @Provides
     fun provideOrderDetailsDao(db: AppDatabase): OrderDetailsDao = db.orderDetailsDao()
+
+    @Provides
+    fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
 }

@@ -20,8 +20,6 @@ fun SplashScreen(
     ) {
         if (state.isLoading) {
             CircularProgressIndicator()
-        } else {
-            Text("Loading Complete") // fallback
         }
     }
 }

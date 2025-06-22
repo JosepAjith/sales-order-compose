@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
@@ -32,7 +33,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.joseph.salesorderapp.ui.component.AppOutlinedTextField
 
 @Composable
@@ -42,7 +42,7 @@ fun LoginScreen(
     val state by viewModel.uiState.collectAsState()
 
     Surface(
-        color = MaterialTheme.colorScheme.background,  // Background color
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier
@@ -57,6 +57,21 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
+            AppOutlinedTextField(
+                value = state.clientCode,
+                onValueChange = viewModel::onClientCodeChanged,
+                label = "Client Code",
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Domain, contentDescription = "Domain Icon")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
+                isError = state.clientCodeError != null,
+                errorMessage = state.clientCodeError,
+                enabled = !state.isDomainAdded,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
 
             AppOutlinedTextField(
                 value = state.username,

@@ -7,7 +7,10 @@ sealed class Routes(val route: String) {
     object CustomerList : Routes("customers")
     object AddCustomer : Routes("add_customer")
     object SaleOrder : Routes("sale_order")
-    object Report : Routes("report")
+    object Report : Routes("order_report")
+    object ReportTypeScreen : Routes("report_type")
+    object ItemWiseReportScreen : Routes("item_wise_report")
+    object SettingsScreen : Routes("settings")
     object ReportDetails : Routes("report_details/{orderId}") {
         fun createRoute(orderId: Int): String = "report_details/$orderId"
     }

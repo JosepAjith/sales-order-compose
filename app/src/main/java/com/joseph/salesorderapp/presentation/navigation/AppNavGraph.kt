@@ -28,14 +28,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.presentation.customer.CustomerScreen
+import com.joseph.salesorderapp.presentation.customer.addcustomer.AddCustomerScreen
 import com.joseph.salesorderapp.presentation.dashboard.DashBoardScreen
 import com.joseph.salesorderapp.presentation.report.details.ReportDetailScreen
+import com.joseph.salesorderapp.presentation.report.itemwise.ItemWiseReportScreen
 import com.joseph.salesorderapp.presentation.report.summary.ReportScreen
+import com.joseph.salesorderapp.presentation.report.types.ReportTypeScreen
 import com.joseph.salesorderapp.presentation.sale.OrderScreen
+import com.joseph.salesorderapp.presentation.settings.SettingsScreen
 import com.joseph.salesorderapp.presentation.splash.SplashScreen
 import com.joseph.salesorderapp.util.UiEvent
 import java.util.Calendar
-
 
 
 @Composable
@@ -117,14 +120,16 @@ fun AppNavGraph(
             composable(Routes.CustomerList.route) { CustomerScreen() }
             composable(Routes.SaleOrder.route) { OrderScreen() }
             composable(Routes.Report.route) { ReportScreen() }
+            composable(Routes.AddCustomer.route) { AddCustomerScreen() }
+            composable(Routes.ReportTypeScreen.route) { ReportTypeScreen() }
+            composable(Routes.ItemWiseReportScreen.route) { ItemWiseReportScreen() }
+            composable(Routes.SettingsScreen.route) { SettingsScreen() }
             composable(
                 route = Routes.ReportDetails.route,
                 arguments = listOf(navArgument("orderId") { type = NavType.IntType })
             ) {
                 ReportDetailScreen()
             }
-
-
         }
     }
 

@@ -147,14 +147,32 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                         )
                     }
                 }
-
-                Button(
-                    onClick = viewModel::saveOrder,
-                    enabled = state.selectedCustomer != null && state.orderItems.isNotEmpty(),
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Save Order")
+                    Button(
+                        onClick = viewModel::clearState,
+                        enabled = state.selectedCustomer != null || state.orderItems.isNotEmpty(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        Text("Cancel Order")
+                    }
+                    Button(
+                        onClick = viewModel::saveOrder,
+                        enabled = state.selectedCustomer != null && state.orderItems.isNotEmpty(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        Text("Save Order")
+                    }
                 }
+
             }
         }
 

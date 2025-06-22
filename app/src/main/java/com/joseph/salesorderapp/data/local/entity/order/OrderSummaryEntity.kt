@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey
 data class OrderSummaryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val customerName: String,
+    val customerID: Int,
+    val userID: Int,
     val totalItems: Int,
     val totalAmount: Double,
     val orderDate: String,

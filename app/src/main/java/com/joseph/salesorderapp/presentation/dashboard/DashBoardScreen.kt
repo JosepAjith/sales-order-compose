@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ListAlt
@@ -25,10 +28,15 @@ import androidx.compose.material.icons.filled.SyncAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,46 +44,64 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.joseph.salesorderapp.presentation.splash.SplashViewModel
 import com.joseph.salesorderapp.ui.component.DashboardCard
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashBoardScreen(
     viewModel: DashBoardViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    Surface(
-        color = MaterialTheme.colorScheme.background
-    ) {
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadUnsyncedCounts()
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            TopAppBar(
+                title = { Text("Home") },
+                actions = {
+                    IconButton(onClick = { viewModel.onCardClicked("settings") }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                },
+                windowInsets = WindowInsets(0)
+            )
+        }
+
+    ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Settings icon
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            // Grid of cards (2 columns × 3 rows)
             Column(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     DashboardCard(
@@ -103,22 +129,26 @@ fun DashBoardScreen(
                         label = "Reports",
                         icon = Icons.Default.Assessment,
                         modifier = Modifier.weight(1f),
-                        onClick = { viewModel.onCardClicked("report") }
+                        onClick = { viewModel.onCardClicked("report_type") }
                     )
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     DashboardCard(
-                        label = "Sync Customers",
+                        label = if ((state.unsyncedCustomersCount ?: 0) > 0)
+                            "Sync Customers\n(${state.unsyncedCustomersCount} pending)"
+                        else "Sync Customers",
                         icon = Icons.Default.Sync,
                         modifier = Modifier.weight(1f),
-                        onClick = { viewModel.onCardClicked("sync_customers") }
+                        onClick = { viewModel.fetchUnsyncedCustomerToSync() }
                     )
                     DashboardCard(
-                        label = "Sync Orders",
+                        label = if ((state.unsyncedOrdersCount ?: 0) > 0)
+                            "Sync Orders\n(${state.unsyncedOrdersCount} pending)"
+                        else "Sync Orders",
                         icon = Icons.Default.SyncAlt,
                         modifier = Modifier.weight(1f),
-                        onClick = { viewModel.onCardClicked("sync_orders") }
+                        onClick = { viewModel.fetchUnsyncedOrdersToSync() }
                     )
                 }
             }

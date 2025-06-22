@@ -21,7 +21,8 @@ fun AppOutlinedTextField(
     isError: Boolean = false,
     errorMessage: String? = null,
     singleLine: Boolean = true,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    enabled: Boolean = true
 ) {
     OutlinedTextField(
         value = value,
@@ -38,6 +39,7 @@ fun AppOutlinedTextField(
             }
         },
         singleLine = singleLine,
-        keyboardOptions = keyboardOptions
+        keyboardOptions = keyboardOptions,
+        enabled = enabled
     )
 }

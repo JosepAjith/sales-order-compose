@@ -6,6 +6,7 @@ import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
 import com.joseph.salesorderapp.domain.model.OrderItem
 import com.joseph.salesorderapp.domain.AppRepository
+import com.joseph.salesorderapp.domain.printer.BluetoothPrinterService
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val repository: AppRepository,
-    private val uiEventManager: UiEventManager
+    private val uiEventManager: UiEventManager,
+    private val printerService: BluetoothPrinterService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OrderState())
@@ -141,6 +143,10 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    fun clearState() {
+        _uiState.value = OrderState()
+    }
+
     fun saveOrder() {
         val state = _uiState.value
         val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.product.stockQty }
@@ -153,10 +159,34 @@ class OrderViewModel @Inject constructor(
                 state.selectedPaymentMode.toString()
             )
 
-            repository.insertOrderDetails(state.orderItems, insertedId)
-            uiEventManager.showSnackbar("Oder saved successfully")
-            _uiState.value = OrderState()
+            repository.insertOrderDetails(state.orderItems, insertedId,state.selectedCustomer)
+            uiEventManager.showToast("Oder saved successfully")
+            printReceipt()
         }
     }
+
+    fun printReceipt() {
+        viewModelScope.launch {
+            uiEventManager.showLoader("Printing please wait", true)
+
+            val text = "[C]<b>Company Name</b>\n[L]Product A      [R]100.00\n"
+            val result = printerService.printText(text)
+
+            result.onSuccess {
+                _uiState.update { it.copy(message = "Printed successfully") }
+                uiEventManager.showToast("Printed successfully")
+            }.onFailure {
+                _uiState.update {
+                    it.copy(message = "Print failed: ${it.message}")
+                }
+                uiEventManager.showToast("Print failed: ${it.message}")
+            }
+
+            uiEventManager.showLoader("", false)
+            clearState()
+        }
+
+    }
+
 }
 

@@ -23,7 +23,11 @@ class AppPreferences @Inject constructor(
     companion object {
         val KEY_AUTH_TOKEN = stringPreferencesKey("auth_token")
         val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+        val KEY_IS_DOMAIN_ADDED = booleanPreferencesKey("is_domain_added")
+        val KEY_DOMAIN_ADDRESS = stringPreferencesKey("domain_address")
+        val KEY_PRINTER_NAME = stringPreferencesKey("print_address")
         val KEY_USER_NAME = stringPreferencesKey("user_name")
+        val KEY_USER_ID = stringPreferencesKey("user_id")
         val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
     }
 
