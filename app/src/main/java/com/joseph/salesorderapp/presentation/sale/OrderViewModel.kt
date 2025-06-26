@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
+import com.joseph.salesorderapp.data.local.preferences.AppPreferences
 import com.joseph.salesorderapp.domain.model.OrderItem
 import com.joseph.salesorderapp.domain.AppRepository
-import com.joseph.salesorderapp.domain.printer.BluetoothPrinterService
 import com.joseph.salesorderapp.presentation.UiEventManager
+import com.joseph.salesorderapp.util.PrinterHelper
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class OrderViewModel @Inject constructor(
     private val repository: AppRepository,
     private val uiEventManager: UiEventManager,
-    private val printerService: BluetoothPrinterService
+    private val appPreferences: AppPreferences,
+    private val printerHelper: PrinterHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OrderState())
@@ -38,6 +41,33 @@ class OrderViewModel @Inject constructor(
     init {
         observeCustomerSearch()
         observeProductSearch()
+        fetchNextOrderId()
+    }
+
+
+    private fun fetchNextOrderId() {
+        viewModelScope.launch {
+            repository.fetchLastOrderNo().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                    }
+
+                    is Resource.Success -> {
+                        val tableId = (result.data ?: 0) + 1
+                        _uiState.update { currentState ->
+                            currentState.copy(nextOrderID = tableId)
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _uiState.update { currentState ->
+                            currentState.copy(message = result.message ?: "Unknown error")
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     private fun observeCustomerSearch() {
@@ -149,44 +179,78 @@ class OrderViewModel @Inject constructor(
 
     fun saveOrder() {
         val state = _uiState.value
-        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.product.stockQty }
+        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
 
         viewModelScope.launch {
+            val userID = appPreferences.getString(AppPreferences.KEY_USER_ID).first()
             val insertedId: Long = repository.insertOrderSummary(
-                state.selectedCustomer?.name.toString(),
+                "SO${state.nextOrderID}",
+                state.selectedCustomer,
                 state.orderItems.size,
                 totalAmount,
-                state.selectedPaymentMode.toString()
+                state.selectedPaymentMode.toString(),
+                userID.toString(),
             )
 
-            repository.insertOrderDetails(state.orderItems, insertedId,state.selectedCustomer)
+            repository.insertOrderDetails(
+                state.orderItems,
+                insertedId,
+                state.selectedCustomer,
+                userID.toString()
+            )
             uiEventManager.showToast("Oder saved successfully")
-            printReceipt()
+            printReceipt(insertedId)
         }
     }
 
-    fun printReceipt() {
+    fun printReceipt(insertedId: Long) {
         viewModelScope.launch {
-            uiEventManager.showLoader("Printing please wait", true)
+            try {
+                val summaryResult = repository
+                    .fetchOrderSummaryById(insertedId.toInt())
+                    .first { it !is Resource.Loading }
 
-            val text = "[C]<b>Company Name</b>\n[L]Product A      [R]100.00\n"
-            val result = printerService.printText(text)
+                if (summaryResult is Resource.Success && summaryResult.data != null) {
+                    val summary = summaryResult.data
 
-            result.onSuccess {
-                _uiState.update { it.copy(message = "Printed successfully") }
-                uiEventManager.showToast("Printed successfully")
-            }.onFailure {
-                _uiState.update {
-                    it.copy(message = "Print failed: ${it.message}")
+                    val detailsResult = repository
+                        .fetchReportItemList(summary.id)
+                        .first { it !is Resource.Loading }
+
+                    if (detailsResult is Resource.Success) {
+                        val fetchedList = detailsResult.data
+                        val details: List<OrderDetailsEntity> = fetchedList ?: emptyList()
+
+                        printerHelper.printOrderReport(
+                            summary = summary,
+                            orderItems = details,
+                            onSuccess = {
+                                uiEventManager.showToast("Printed successfully")
+                                newOrder()
+                            },
+                            onFailure = { error ->
+                                uiEventManager.showToast("Print failed: $error")
+                                newOrder()
+                            }
+                        )
+                    } else {
+                        uiEventManager.showToast("Failed to fetch order details")
+                    }
+
+                } else {
+                    uiEventManager.showToast("No order summary found")
                 }
-                uiEventManager.showToast("Print failed: ${it.message}")
+            } catch (e: Exception) {
+                uiEventManager.showToast("Error: ${e.message}")
+            } finally {
+                uiEventManager.showLoader("", false)
             }
-
-            uiEventManager.showLoader("", false)
-            clearState()
         }
-
     }
 
+    fun newOrder() {
+        fetchNextOrderId()
+        clearState()
+    }
 }
 

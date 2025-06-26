@@ -22,4 +22,10 @@ object DateUtils {
         val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
         return formatter.format(date)
     }
+
+    fun getCurrentTimeOnly(): String {
+        val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return formatter.format(Date())
+    }
+
 }

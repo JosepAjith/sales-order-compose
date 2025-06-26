@@ -2,6 +2,8 @@ package com.joseph.salesorderapp.presentation.sale
 
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
 import com.joseph.salesorderapp.domain.model.OrderItem
 
 data class OrderState(
@@ -13,4 +15,7 @@ data class OrderState(
     val quantity: String = "",
     val orderItems: List<OrderItem> = emptyList(),
     val message: String = "",
+    val nextOrderID: Int? = null,
+    val orderSummary: OrderSummaryEntity? = null,
+    val itemList: List<OrderDetailsEntity> = emptyList()
 )

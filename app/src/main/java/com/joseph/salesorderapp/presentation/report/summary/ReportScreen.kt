@@ -144,7 +144,7 @@ fun ReportScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { viewModel.onOrderClicked(order.id) }
-                            .padding( vertical = 8.dp)
+                            .padding(vertical = 8.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
@@ -164,6 +164,14 @@ fun ReportScreen(
 
                             // Order Summary Details
                             Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = order.orderID,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    ),
+                                    maxLines = 1
+                                )
                                 Text(
                                     text = order.customerName,
                                     style = MaterialTheme.typography.bodyMedium.copy(

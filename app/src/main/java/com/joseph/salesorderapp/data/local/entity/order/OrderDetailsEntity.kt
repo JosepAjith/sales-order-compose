@@ -16,6 +16,7 @@ data class OrderDetailsEntity(
     val orderDate: String,
     val customerName: String,
     val customerID: Int,
+    val userID: Int,
     val discount: Double,
     val totalPrice: Double,
     val isSynced: Boolean = false,

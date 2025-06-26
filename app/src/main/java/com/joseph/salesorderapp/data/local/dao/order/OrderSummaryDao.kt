@@ -35,4 +35,8 @@ interface OrderSummaryDao {
     @Query("UPDATE order_summary SET isSynced = 1 WHERE id = :orderId")
     suspend fun updateOrderSynced(orderId: Long)
 
+    @Query("SELECT MAX(id) FROM order_summary")
+    suspend fun getLastOrderId(): Int?
+
+
 }

@@ -173,37 +173,50 @@ class DashBoardViewModel @Inject constructor(
 
     fun fetchUnsyncedOrdersToSync() {
         viewModelScope.launch {
-            if (uiState.value.unsyncedOrdersCount!! > 0) {
-                uiEventManager.showLoader("Fetching unsynced orders...", true)
-                repository.fetchSyncPendingOrders().collect { result ->
-                    when (result) {
-                        is Resource.Loading -> {
-                            _uiState.update { it.copy(error = null) }
-                        }
+            val ordersCount = uiState.value.unsyncedOrdersCount ?: 0
+            val customersCount = uiState.value.unsyncedCustomersCount ?: 0
 
-                        is Resource.Success -> {
-                            _uiState.update {
-                                it.copy(
-                                    unsyncedOrders = result.data ?: emptyList(),
-                                    error = null,
-                                    success = true
-                                )
-                            }
-                            syncOrdersOneByOne(uiState.value.unsyncedOrders)
-                        }
+            if (ordersCount == 0) {
+                uiEventManager.showSnackbar("No data to sync")
+                return@launch
+            }
 
-                        is Resource.Error -> {
-                            _uiState.update {
-                                it.copy(error = result.message)
-                            }
+            if (customersCount >0) {
+                uiEventManager.showSnackbar("Please sync customer data before syncing orders.")
+                return@launch
+            }
+
+            uiEventManager.showLoader("Fetching unsynced orders...", true)
+
+            repository.fetchSyncPendingOrders().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _uiState.update { it.copy(error = null) }
+                    }
+
+                    is Resource.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                unsyncedOrders = result.data ?: emptyList(),
+                                error = null,
+                                success = true
+                            )
                         }
+                        syncOrdersOneByOne(uiState.value.unsyncedOrders)
+                    }
+
+                    is Resource.Error -> {
+                        _uiState.update {
+                            it.copy(error = result.message)
+                        }
+                        uiEventManager.showToast("Failed to fetch orders: ${result.message}")
                     }
                 }
-                uiEventManager.showLoader("", false)
-            } else {
-                uiEventManager.showToast("No data to sync")
             }
+
+            uiEventManager.showLoader("", false)
         }
+
     }
 
     private suspend fun syncOrdersOneByOne(orderList: List<OrderSummaryEntity>) {
@@ -223,6 +236,7 @@ class DashBoardViewModel @Inject constructor(
                 orderToken = order.id.toString(),
                 userId = order.userID.toString(),
                 customerMasterId = order.customerID,
+                payMode = order.paymentMode,
                 salesMasterId = order.id,
                 details = orderItems.map {
                     OrderItemPayload(

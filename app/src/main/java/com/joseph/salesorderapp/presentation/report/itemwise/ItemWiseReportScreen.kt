@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,10 +30,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -67,6 +71,11 @@ fun ItemWiseReportScreen(
                 navigationIcon = {
                     IconButton(onClick = { viewModel.onBackPress() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.printReport() }) {
+                        Icon(Icons.Default.Print, contentDescription = "Print")
                     }
                 },
                 windowInsets = WindowInsets(0)
@@ -135,6 +144,7 @@ fun ItemWiseReportScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         SearchableDropdown(
@@ -144,18 +154,19 @@ fun ItemWiseReportScreen(
                             onSearchQueryChanged = viewModel::updateCustomerSearch,
                             itemLabel = { it.name },
                             label = "Customer",
-                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1.6f),
                         )
 
                         OutlinedButton(
                             modifier = Modifier
-                                .fillMaxWidth().weight(1f),
+                                .fillMaxWidth()
+                                .weight(0.4f),
                             shape = RoundedCornerShape(8.dp),
                             onClick = { viewModel.searchItems() }
                         ) {
                             Icon(Icons.Default.Search, contentDescription = "Search")
-                            Spacer(Modifier.width(4.dp))
-                            Text("Search")
                         }
                     }
                 }

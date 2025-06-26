@@ -24,16 +24,22 @@ interface OrderDetailsDao {
     suspend fun updateOrderItemsSyncStatus(orderId: Long)
 
     @Query(
-        """SELECT productID AS productId,productName,productCode,SUM(quantity) AS 
-        totalQty,SUM(quantity * pricePerUnit) AS totalAmount
+        """
+    SELECT productID AS productId, productName, productCode,
+           SUM(quantity) AS totalQty,
+           SUM(quantity * pricePerUnit) AS totalAmount
     FROM order_details
     WHERE orderDate BETWEEN :fromDate AND :toDate
-    GROUP BY productID"""
+      AND (:customerId IS NULL OR customerID = :customerId)
+    GROUP BY productID
+    """
     )
     fun fetchItemWiseReport(
         fromDate: String,
         toDate: String,
+        customerId: Int? = null
     ): Flow<List<ItemWiseReport>>
+
 
 }
 

@@ -3,15 +3,18 @@ package com.joseph.salesorderapp.presentation.report.itemwise
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.DateUtils
+import com.joseph.salesorderapp.util.PrinterHelper
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ItemWiseViewModel @Inject constructor(
     private val repository: AppRepository,
-    private val uiEventManager: UiEventManager
+    private val uiEventManager: UiEventManager,
+    private val printerHelper: PrinterHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ItemWiseState())
@@ -68,6 +72,7 @@ class ItemWiseViewModel @Inject constructor(
             repository.fetchItemWiseReport(
                 _uiState.value.fromDateFormatted,
                 _uiState.value.toDateFormatted,
+                _uiState.value.selectedCustomer?.serverId,
             ).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
@@ -91,7 +96,6 @@ class ItemWiseViewModel @Inject constructor(
                     }
                 }
             }
-
 
             uiEventManager.showLoader("", false)
         }
@@ -144,6 +148,29 @@ class ItemWiseViewModel @Inject constructor(
     fun onBackPress() {
         viewModelScope.launch {
             uiEventManager.navigateUp()
+        }
+    }
+
+    fun printReport() {
+        viewModelScope.launch {
+            try {
+                printerHelper.printItemWiseReport(
+                    customer = uiState.value.selectedCustomer,
+                    orderItems = uiState.value.itemList,
+                    fromDate = uiState.value.fromDateFormatted,
+                    toDate = uiState.value.fromDateFormatted,
+                    onSuccess = {
+                        uiEventManager.showToast("Printed successfully")
+                    },
+                    onFailure = { error ->
+                        uiEventManager.showToast("Print failed: $error")
+                    }
+                )
+            } catch (e: Exception) {
+                uiEventManager.showToast("Error: ${e.message}")
+            } finally {
+                uiEventManager.showLoader("", false)
+            }
         }
     }
 }

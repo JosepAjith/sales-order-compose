@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import java.text.DecimalFormat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBar
+import com.joseph.salesorderapp.util.DateUtils
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,7 +127,6 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                         )
                     }
 
-                    // Total Amount
                     Column(
                         horizontalAlignment = Alignment.End,
                         modifier = Modifier.weight(1f)
@@ -183,6 +183,26 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
+            )
+
+            {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "SO NO: SO${state.nextOrderID}",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    text = DateUtils.getCurrentDate(),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             SearchableDropdown(
                 items = state.customers,
                 selectedItem = state.selectedCustomer,
@@ -262,7 +282,6 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
 
                             Spacer(modifier = Modifier.width(12.dp))
 
-                            // Name and details
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = item.product.name,

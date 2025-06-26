@@ -10,6 +10,9 @@ data class SaveOrderInput(
 	@field:SerializedName("user_id")
 	val userId: String? = null,
 
+	@field:SerializedName("pay_mode")
+	val payMode: String? = null,
+
 	@field:SerializedName("sales_master_id")
 	val salesMasterId: Int? = null,
 

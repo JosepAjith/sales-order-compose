@@ -38,7 +38,7 @@ import javax.inject.Inject
 class AppRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val remoteDataSource: RemoteDataSource,
-    private val localDataSource: LocalDataSource
+    private val localDataSource: LocalDataSource,
 ) : AppRepository {
 
     //Remote API
@@ -254,20 +254,25 @@ class AppRepositoryImpl @Inject constructor(
 
 
     override suspend fun insertOrderSummary(
-        customer: String,
+        orderID: String,
+        selectedCustomer: CustomerEntity?,
         totItems: Int,
         total: Double,
-        paymentMode: String
+        paymentMode: String,
+        userID: String,
     ): Long {
+
         val orderSummary = OrderSummaryEntity(
-            customerName = customer,
-            customerID = 0,
-            userID = 0,
+            customerName = selectedCustomer?.name.toString(),
+            customerID = selectedCustomer?.serverId ?: 0,
+            userID = userID.toIntOrNull() ?: 0,
+            orderID = orderID,
             totalItems = totItems,
             totalAmount = total,
             isSynced = false,
             paymentMode = paymentMode,
             orderDate = DateUtils.getCurrentDate(),
+            orderTime = DateUtils.getCurrentTimeOnly(),
             createdAt = DateUtils.getCurrentTimestamp(),
             updatedAt = DateUtils.getCurrentTimestamp()
         )
@@ -294,7 +299,8 @@ class AppRepositoryImpl @Inject constructor(
     override suspend fun insertOrderDetails(
         itemList: List<OrderItem>,
         orderId: Long,
-        selectedCustomer: CustomerEntity?
+        selectedCustomer: CustomerEntity?,
+        userID: String
     ) {
         val orderItems = itemList.map {
             OrderDetailsEntity(
@@ -310,6 +316,7 @@ class AppRepositoryImpl @Inject constructor(
                 isSynced = false,
                 customerID = selectedCustomer?.serverId ?: 0,
                 customerName = selectedCustomer?.name ?: "",
+                userID = userID.toIntOrNull() ?: 0,
                 orderDate = DateUtils.getCurrentDate(),
                 createdAt = DateUtils.getCurrentTimestamp(),
                 updatedAt = DateUtils.getCurrentTimestamp()
@@ -419,14 +426,26 @@ class AppRepositoryImpl @Inject constructor(
     override suspend fun fetchItemWiseReport(
         fromDate: String,
         toDate: String,
+        customerID: Int?,
     ): Flow<Resource<List<ItemWiseReport>>> {
         return flow {
             emit(Resource.Loading())
             val orderItems =
-                localDataSource.fetchItemWiseReport(fromDate, toDate).first()
+                localDataSource.fetchItemWiseReport(fromDate, toDate, customerID).first()
             emit(Resource.Success(orderItems))
         }.catch { e ->
             emit(Resource.Error("Error: ${e.message}"))
+        }
+    }
+
+
+    override suspend fun fetchLastOrderNo(): Flow<Resource<Int>> = flow {
+        emit(Resource.Loading())
+        try {
+            val lastNo: Int = localDataSource.fetchLastOrderNo() ?: 0
+            emit(Resource.Success(lastNo))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Unknown error"))
         }
     }
 }

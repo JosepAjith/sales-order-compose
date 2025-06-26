@@ -110,8 +110,12 @@ class LocalDataSource @Inject constructor(
     fun fetchItemWiseReport(
         fromDate: String,
         toDate: String,
+        customerID: Int?,
     ): Flow<List<ItemWiseReport>> {
-        return orderDetailsDao.fetchItemWiseReport(fromDate, toDate)
+        return orderDetailsDao.fetchItemWiseReport(fromDate, toDate,customerID)
     }
 
+    suspend fun fetchLastOrderNo(): Int? {
+        return orderSummaryDao.getLastOrderId()
+    }
 }

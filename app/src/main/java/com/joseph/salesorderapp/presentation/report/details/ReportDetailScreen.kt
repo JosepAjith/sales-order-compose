@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -58,8 +60,13 @@ fun ReportDetailScreen(
             TopAppBar(
                 title = { Text("Order Details") },
                 navigationIcon = {
-                    IconButton(onClick = {viewModel.onBackPress()}) {
+                    IconButton(onClick = { viewModel.onBackPress() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.printReceipt() }) {
+                        Icon(Icons.Default.Print, contentDescription = "Print")
                     }
                 },
                 windowInsets = WindowInsets(0)
@@ -76,6 +83,14 @@ fun ReportDetailScreen(
             Column(
             ) {
                 Text(
+                    text = state.orderSummary?.orderID.toString(),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    maxLines = 1
+                )
+                Text(
                     text = state.orderSummary?.customerName.toString(),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.SemiBold,
@@ -88,20 +103,26 @@ fun ReportDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Date: ${state.orderSummary?.orderDate}",
-                        style = labelStyle,
-                        modifier = Modifier.weight(1f)
-                    )
+
                     Text(
                         text = "Payment Mode: ${state.orderSummary?.paymentMode}",
+                        style = totalStyle,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "Date: ${state.orderSummary?.orderDate}",
                         style = totalStyle,
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.End
                     )
                 }
             }
-
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Products", style = MaterialTheme.typography.titleMedium)
@@ -136,7 +157,7 @@ fun ReportDetailScreen(
                                     ),
                                     maxLines = 1
                                 )
-
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween

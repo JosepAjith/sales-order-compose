@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,8 +27,7 @@ class BluetoothPrinterManager @Inject constructor(
     override suspend fun printText(receiptText: String): Result<Unit> =
         withContext(Dispatchers.IO) {
             try {
-                val savedPrinterName =
-                    appPreferences.getString(AppPreferences.KEY_PRINTER_NAME).firstOrNull()
+                val savedPrinterName = appPreferences.getString(AppPreferences.KEY_PRINTER_NAME).firstOrNull()
 
                 if (savedPrinterName.isNullOrEmpty()) {
                     return@withContext Result.failure(Exception("Printer name not set in preferences"))
@@ -34,24 +35,37 @@ class BluetoothPrinterManager @Inject constructor(
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     val permission = Manifest.permission.BLUETOOTH_CONNECT
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            permission
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
+                    if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                         return@withContext Result.failure(Exception("Missing BLUETOOTH_CONNECT permission"))
                     }
                 }
 
-                val connection = BluetoothPrintersConnections().list
-                    ?.firstOrNull { it.device?.name.equals(savedPrinterName, ignoreCase = true) }
-
-                if (connection == null) {
-                    return@withContext Result.failure(Exception("Bluetooth printer '$savedPrinterName' not found"))
+                val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+                if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled) {
+                    return@withContext Result.failure(Exception("Bluetooth is not enabled"))
                 }
+
+                val bondedDevices = bluetoothAdapter.bondedDevices
+                if (bondedDevices.isEmpty()) {
+                    return@withContext Result.failure(Exception("No paired Bluetooth devices found"))
+                }
+
+                val matchedDevice = bondedDevices.firstOrNull { device ->
+                    device.name?.equals(savedPrinterName, ignoreCase = true) == true
+                }
+
+                if (matchedDevice == null) {
+                    return@withContext Result.failure(Exception("Printer '$savedPrinterName' not found in paired devices"))
+                }
+
+                val connection = BluetoothConnection(matchedDevice)
+
+                connection.connect()
 
                 val printer = EscPosPrinter(connection, 203, 48f, 32)
                 printer.printFormattedText(receiptText)
+
+                connection.disconnect()
 
                 Result.success(Unit)
 

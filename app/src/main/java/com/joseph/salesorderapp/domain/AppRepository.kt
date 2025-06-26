@@ -41,10 +41,12 @@ interface AppRepository {
     suspend fun deleteAllProducts()
 
     suspend fun insertOrderSummary(
-        customer: String,
+        orderID: String,
+        selectedCustomer: CustomerEntity?,
         totItems: Int,
         total: Double,
-        paymentMode: String
+        paymentMode: String,
+        userID: String,
     ): Long
 
     suspend fun insertCustomer(name: String, phone: String, address: String)
@@ -52,7 +54,8 @@ interface AppRepository {
     suspend fun insertOrderDetails(
         itemList: List<OrderItem>,
         orderId: Long,
-        selectedCustomer: CustomerEntity?
+        selectedCustomer: CustomerEntity?,
+        userID: String,
     )
 
     suspend fun fetchOrderSummary(
@@ -78,7 +81,9 @@ interface AppRepository {
     suspend fun fetchItemWiseReport(
         fromDate: String,
         toDate: String,
+        customerID: Int?,
     ): Flow<Resource<List<ItemWiseReport>>>
 
+    suspend fun fetchLastOrderNo(): Flow<Resource<Int>>
 
 }

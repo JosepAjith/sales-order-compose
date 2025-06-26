@@ -8,7 +8,7 @@ import java.util.Date
 data class ItemWiseState(
     val error: String? = null,
     val success: Boolean = false,
-    val isLoading: Boolean=false,
+    val isLoading: Boolean = false,
     val itemList: List<ItemWiseReport> = emptyList(),
     val fromDate: Date = Date(),
     val toDate: Date = Date(),
