@@ -1,5 +1,7 @@
 package com.joseph.salesorderapp.presentation.dashboard
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,9 +35,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.joseph.salesorderapp.ui.component.BluetoothPermissionHandler
 import com.joseph.salesorderapp.ui.component.DashboardCard
 
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashBoardScreen(
@@ -43,6 +47,16 @@ fun DashBoardScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    BluetoothPermissionHandler(
+        onPermissionGranted = {
+
+        },
+        onPermissionDenied = {
+
+        }
+    )
+
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
