@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -30,6 +32,20 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+    }
+    applicationVariants.configureEach {
+        val variant = this
+
+        outputs.configureEach {
+            val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
+            if (variant.buildType.name == "debug") {
+                val versionName = variant.versionName ?: "1.0"
+                val newName = "salesorderapp-$versionName.apk"
+
+                outputImpl.outputFileName = newName
+            }
         }
     }
     compileOptions {
