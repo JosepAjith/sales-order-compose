@@ -37,7 +37,7 @@ interface ApiService {
         @Body request: SaveOrderInput
     ): Response<OrderResponse>
 
-    @POST("customer-sync/{slug}")
+    @POST("save-customer-mobile/{slug}")
     suspend fun saveCustomer(
         @Path("slug") slug: String,
         @Body request: SaveCustomerInput

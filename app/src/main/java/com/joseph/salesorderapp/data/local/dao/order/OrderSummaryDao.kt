@@ -38,5 +38,9 @@ interface OrderSummaryDao {
     @Query("SELECT MAX(id) FROM order_summary")
     suspend fun getLastOrderId(): Int?
 
+    @Query("UPDATE order_summary SET customerID = :serverID WHERE customerID = :customerID")
+    suspend fun updateOrderCustomerID(serverID: Int?, customerID: Int)
+
+
 
 }

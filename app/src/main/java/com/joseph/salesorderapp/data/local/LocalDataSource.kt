@@ -68,7 +68,6 @@ class LocalDataSource @Inject constructor(
 
     fun fetchOrderSummaryById(orderID: Int): Flow<OrderSummaryEntity?> {
         return orderSummaryDao.fetchOrderSummaryById(orderID)
-
     }
 
     fun fetchReportItemList(orderID: Int): Flow<List<OrderDetailsEntity>> {
@@ -91,12 +90,22 @@ class LocalDataSource @Inject constructor(
         orderSummaryDao.updateOrderSynced(orderId)
     }
 
+
+        suspend fun updateOrderCustomerID(serverID:Int?,customerID: Int) {
+        orderSummaryDao.updateOrderCustomerID(serverID,customerID)
+    }
+
+    suspend fun updateOrderDetailCustomerID(serverID:Int?,customerID: Int) {
+        orderDetailsDao.updateOrderDetailCustomerID(serverID,customerID)
+    }
+
+
     suspend fun updateOrderItemsSyncStatus(orderId: Long) {
         orderDetailsDao.updateOrderItemsSyncStatus(orderId)
     }
 
-    suspend fun updateCustomerSyncStatus(customerID: Long) {
-        customerDao.updateCustomerSynced(customerID)
+    suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?) {
+        customerDao.updateCustomerSynced(customerID,serverID)
     }
 
     fun fetchSyncPendingCustomer(): Flow<List<CustomerEntity>> {

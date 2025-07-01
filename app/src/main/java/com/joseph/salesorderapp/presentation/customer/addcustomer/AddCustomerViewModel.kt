@@ -2,12 +2,8 @@ package com.joseph.salesorderapp.presentation.customer.addcustomer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.joseph.salesorderapp.data.local.preferences.AppPreferences
-import com.joseph.salesorderapp.data.remote.model.CustomerPayload
-import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
-import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

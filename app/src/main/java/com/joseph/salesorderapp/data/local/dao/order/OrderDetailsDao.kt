@@ -41,5 +41,8 @@ interface OrderDetailsDao {
     ): Flow<List<ItemWiseReport>>
 
 
+    @Query("UPDATE order_details SET customerID = :serverID WHERE customerID = :customerID")
+    suspend fun updateOrderDetailCustomerID(serverID: Int?, customerID: Int)
+
 }
 

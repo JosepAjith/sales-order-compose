@@ -76,7 +76,9 @@ interface AppRepository {
 
     suspend fun updateOrderSyncStatus(orderId: Long)
     suspend fun updateOrderItemsSyncStatus(orderId: Long)
-    suspend fun updateCustomerSyncStatus(customerID: Long)
+    suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?)
+    suspend fun updateOrderCustomerID(serverID: Int?,customerID: Int)
+    suspend fun updateOrderDetailCustomerID(serverID: Int?,customerID: Int)
 
     suspend fun fetchItemWiseReport(
         fromDate: String,

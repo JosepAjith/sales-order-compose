@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
-import com.joseph.salesorderapp.data.remote.model.CustomerPayload
 import com.joseph.salesorderapp.data.remote.model.OrderItemPayload
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
@@ -319,23 +318,20 @@ class DashBoardViewModel @Inject constructor(
             uiEventManager.showLoader("Syncing customer ${index + 1} of ${customerList.size}", true)
 
             val payload = SaveCustomerInput(
-                customer = listOf(
-                    CustomerPayload(
                         name = customer.name,
                         address = customer.address,
-                        phone = customer.phoneNo,
-                        masterId = 0,
-                        trdNo = "hghg",
-                    )
-                )
-            )
+                        masterId = customer.id,
+                        trdNo = customer.id.toString())
 
             repository.saveCustomer(payload).collect { customerResult ->
                 when (customerResult) {
 
                     is Resource.Success -> {
                         if (customerResult.data?.status == 1) {
-                            repository.updateCustomerSyncStatus(customer.id.toLong())
+                            val serverID=customerResult.data.data?.id
+                            repository.updateCustomerSyncStatus(customer.id.toLong(),serverID)
+                            repository.updateOrderCustomerID(serverID,customer.id)
+                            repository.updateOrderDetailCustomerID(serverID,customer.id)
 
                             _uiState.update {
                                 it.copy(unsyncedOrders = it.unsyncedOrders.filterNot { o -> o.id == customer.id })

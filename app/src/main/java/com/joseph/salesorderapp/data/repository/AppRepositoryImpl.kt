@@ -261,10 +261,15 @@ class AppRepositoryImpl @Inject constructor(
         paymentMode: String,
         userID: String,
     ): Long {
+        val customerID = if (selectedCustomer?.serverId != 0) {
+            selectedCustomer?.serverId ?: 0
+        } else {
+            selectedCustomer.id
+        }
 
         val orderSummary = OrderSummaryEntity(
             customerName = selectedCustomer?.name.toString(),
-            customerID = selectedCustomer?.serverId ?: 0,
+            customerID =customerID,
             userID = userID.toIntOrNull() ?: 0,
             orderID = orderID,
             totalItems = totItems,
@@ -302,6 +307,12 @@ class AppRepositoryImpl @Inject constructor(
         selectedCustomer: CustomerEntity?,
         userID: String
     ) {
+        val customerID = if (selectedCustomer?.serverId != 0) {
+            selectedCustomer?.serverId ?: 0
+        } else {
+            selectedCustomer.id
+        }
+
         val orderItems = itemList.map {
             OrderDetailsEntity(
                 orderId = orderId,
@@ -314,7 +325,7 @@ class AppRepositoryImpl @Inject constructor(
                 discount = 0.0,
                 totalPrice = it.product.sellingPrice * it.product.stockQty,
                 isSynced = false,
-                customerID = selectedCustomer?.serverId ?: 0,
+                customerID = customerID,
                 customerName = selectedCustomer?.name ?: "",
                 userID = userID.toIntOrNull() ?: 0,
                 orderDate = DateUtils.getCurrentDate(),
@@ -418,8 +429,16 @@ class AppRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateCustomerSyncStatus(customerID: Long) {
-        localDataSource.updateCustomerSyncStatus(customerID)
+    override suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?) {
+        localDataSource.updateCustomerSyncStatus(customerID,serverID)
+    }
+
+    override suspend fun updateOrderCustomerID( serverID: Int?,customerID:Int) {
+        localDataSource.updateOrderCustomerID(serverID,customerID)
+    }
+
+    override suspend fun updateOrderDetailCustomerID( serverID: Int?,customerID:Int) {
+        localDataSource.updateOrderDetailCustomerID(serverID,customerID)
     }
 
 

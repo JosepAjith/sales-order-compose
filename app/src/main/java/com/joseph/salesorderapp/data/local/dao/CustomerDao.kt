@@ -35,8 +35,8 @@ interface CustomerDao {
     @Query("SELECT * FROM customers WHERE isSynced = 0")
     fun getUnsyncedCustomerEntities(): Flow<List<CustomerEntity>>
 
-    @Query("UPDATE customers SET isSynced = 1 WHERE id = :customerID")
-    suspend fun updateCustomerSynced(customerID: Long)
+    @Query("UPDATE customers SET isSynced = 1 , serverId = :serverID WHERE id = :customerID")
+    suspend fun updateCustomerSynced(customerID: Long, serverID: Int?)
 
 
 }
