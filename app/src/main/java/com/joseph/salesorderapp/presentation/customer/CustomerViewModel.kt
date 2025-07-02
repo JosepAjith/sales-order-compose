@@ -2,11 +2,8 @@ package com.joseph.salesorderapp.presentation.customer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Query
-import com.joseph.salesorderapp.data.remote.model.CustomersItem
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
-import com.joseph.salesorderapp.presentation.dashboard.DashBoardState
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

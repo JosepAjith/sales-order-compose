@@ -3,7 +3,6 @@ package com.joseph.salesorderapp.presentation.report.itemwise
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
-import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.DateUtils
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

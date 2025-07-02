@@ -7,7 +7,6 @@ import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
