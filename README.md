@@ -55,22 +55,30 @@ An offline-first sales order entry Android application built using modern Androi
 
 ```
 
+
 ## 📱 Screenshots
 
-### 🔐 Login Screen
-![Login](screens/login_screen.jpeg)
+<table>
+  <tr>
+    <td align="center"><strong>🔐 Login</strong></td>
+    <td align="center"><strong>🏠 Home</strong></td>
+    <td align="center"><strong>🧾 Order Entry</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screens/login_screen.jpeg" width="200"/></td>
+    <td><img src="screens/home_screen.jpeg" width="200"/></td>
+    <td><img src="screens/entry_screen.jpeg" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>📊 Report Summary</strong></td>
+    <td align="center"><strong>📋 Itemwise Report</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screens/report_screen.jpeg" width="200"/></td>
+    <td><img src="screens/itemwise_screen.jpeg" width="200"/></td>
+  </tr>
+</table>
 
-### 🏠 Home Screen
-![Home](screens/home_screen.jpeg)
-
-### 🧾 Order Entry Screen
-![Order Entry](screens/entry_screen.jpeg)
-
-### 📊 Report Summary Screen
-![Report](screens/report_screen.jpeg)
-
-### 📋 Itemwise Report Screen
-![Itemwise](screens/itemwise_screen.jpeg)
 
 
 
