@@ -12,6 +12,7 @@ data class OrderSummaryEntity(
     val userID: Int,
     val totalItems: Int,
     val totalAmount: Double,
+    val discountAmount:Double,
     val orderDate: String,
     val orderTime: String,
     val paymentMode: String,

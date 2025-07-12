@@ -20,7 +20,7 @@ import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
         OrderSummaryEntity::class,
         OrderDetailsEntity::class,
         UserEntity::class,
-    ], version = 1
+    ], version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun customerDao(): CustomerDao

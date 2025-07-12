@@ -14,6 +14,7 @@ import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerResponse
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
+import com.joseph.salesorderapp.data.remote.model.SettingsResponse
 import com.joseph.salesorderapp.data.remote.model.UserDataItem
 import com.joseph.salesorderapp.data.remote.model.UserResponse
 import com.joseph.salesorderapp.domain.model.ItemWiseReport
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 interface AppRepository {
     //Remote API
     suspend fun login(username: String, password: String): Flow<Resource<LoginResponse>>
+    suspend fun downloadSettings(): Flow<Resource<SettingsResponse>>
     suspend fun downloadCustomers(): Flow<Resource<CustomerResponse>>
     suspend fun downloadProducts(): Flow<Resource<ProductResponse>>
     suspend fun downloadUsers(): Flow<Resource<UserResponse>>
@@ -45,6 +47,7 @@ interface AppRepository {
         selectedCustomer: CustomerEntity?,
         totItems: Int,
         total: Double,
+        discountAmount:Double,
         paymentMode: String,
         userID: String,
     ): Long

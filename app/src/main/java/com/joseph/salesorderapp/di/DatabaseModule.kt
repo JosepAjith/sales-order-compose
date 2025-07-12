@@ -8,6 +8,7 @@ import com.joseph.salesorderapp.data.local.dao.UserDao
 import com.joseph.salesorderapp.data.local.dao.order.OrderDetailsDao
 import com.joseph.salesorderapp.data.local.dao.order.OrderSummaryDao
 import com.joseph.salesorderapp.data.local.db.AppDatabase
+import com.joseph.salesorderapp.data.local.db.MIGRATION_1_2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +27,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "app_database"
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
 
     @Provides
     fun provideCustomerDao(db: AppDatabase): CustomerDao = db.customerDao()

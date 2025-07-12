@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Print
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -80,8 +79,7 @@ fun ReportDetailScreen(
                 .fillMaxSize()
         ) {
 
-            Column(
-            ) {
+            Column {
                 Text(
                     text = state.orderSummary?.orderID.toString(),
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -191,7 +189,25 @@ fun ReportDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Column(horizontalAlignment = Alignment.End) {
+                val discount = state.orderSummary?.discountAmount ?: 0.0
+                if (discount > 0) {
+                    Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Discount",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Text(
+                            "${priceFormatter.format(state.orderSummary?.discountAmount ?: 0.000)}",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+                Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
                     Text(
                         "Total Amount",
                         style = MaterialTheme.typography.labelMedium,

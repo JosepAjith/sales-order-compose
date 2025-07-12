@@ -2,6 +2,7 @@ package com.joseph.salesorderapp.presentation.customer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.joseph.salesorderapp.data.local.preferences.AppPreferences
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
 import com.joseph.salesorderapp.util.Resource
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomerViewModel @Inject constructor(
     private val repository: AppRepository,
-    private val uiEventManager: UiEventManager
+    private val uiEventManager: UiEventManager,
+    private val appPreferences: AppPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CustomerState())
@@ -28,6 +31,10 @@ class CustomerViewModel @Inject constructor(
 
     private fun fetchCustomers(query: String) {
         viewModelScope.launch {
+            val isEnableCustomerCreation =
+                appPreferences.getBoolean(AppPreferences.KEY_IS_CUSTOMER_CREATION_ENABLED).first()
+            _uiState.update { it.copy(enableCustomerCreation =isEnableCustomerCreation ) }
+
             uiEventManager.showLoader("Loading..", true)
             repository.fetchCustomers(query).collect { result ->
                 when (result) {

@@ -47,6 +47,17 @@ class OrderViewModel @Inject constructor(
         observeCustomerSearch()
         observeProductSearch()
         fetchNextOrderId()
+        fetchSettings()
+    }
+
+    private fun fetchSettings() {
+        viewModelScope.launch {
+            val isEnableDiscount =
+                appPreferences.getBoolean(AppPreferences.KEY_IS_TOTAL_BILL_DISC_ENABLED).first()
+            _uiState.update {
+                it.copy(isEnableDiscount = isEnableDiscount)
+            }
+        }
     }
 
 
@@ -151,6 +162,19 @@ class OrderViewModel @Inject constructor(
     fun updateQuantity(quantity: String) {
         _uiState.update { it.copy(quantity = quantity) }
     }
+    fun updateDiscount(discount: String) {
+        _uiState.update { it.copy(discount = discount) }
+        updateTotal()
+    }
+
+    private fun updateTotal() {
+        val state = _uiState.value
+        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
+        val discount = state.discount.toDoubleOrNull() ?: 0.0
+        val finalAmount = (totalAmount - discount).coerceAtLeast(0.0)
+
+        _uiState.update { it.copy(totalAmount = finalAmount) }
+    }
 
     fun addProductToOrder() {
         val state = _uiState.value
@@ -165,6 +189,8 @@ class OrderViewModel @Inject constructor(
                 quantity = ""
             )
         }
+
+        updateTotal()
         _requestProductFocus.value = true
     }
 
@@ -179,12 +205,12 @@ class OrderViewModel @Inject constructor(
     }
 
     fun clearState() {
+        _requestProductFocus.value = true
         _uiState.value = OrderState()
     }
 
     fun saveOrder() {
         val state = _uiState.value
-        val totalAmount = state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
 
         viewModelScope.launch {
             val userID = appPreferences.getString(AppPreferences.KEY_USER_ID).first()
@@ -192,7 +218,8 @@ class OrderViewModel @Inject constructor(
                 "SO${state.nextOrderID}",
                 state.selectedCustomer,
                 state.orderItems.size,
-                totalAmount,
+                state.totalAmount,
+                state.discount.toDoubleOrNull() ?: 0.0,
                 state.selectedPaymentMode.toString(),
                 userID.toString(),
             )
@@ -208,7 +235,7 @@ class OrderViewModel @Inject constructor(
         }
     }
 
-    fun printReceipt(insertedId: Long) {
+    private fun printReceipt(insertedId: Long) {
         viewModelScope.launch {
             try {
                 val summaryResult = repository
@@ -253,7 +280,7 @@ class OrderViewModel @Inject constructor(
         }
     }
 
-    fun newOrder() {
+    private fun newOrder() {
         fetchNextOrderId()
         clearState()
     }

@@ -22,13 +22,22 @@ class AppPreferences @Inject constructor(
     // Define Keys
     companion object {
         val KEY_AUTH_TOKEN = stringPreferencesKey("auth_token")
-        val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
-        val KEY_IS_DOMAIN_ADDED = booleanPreferencesKey("is_domain_added")
         val KEY_DOMAIN_ADDRESS = stringPreferencesKey("domain_address")
         val KEY_PRINTER_NAME = stringPreferencesKey("print_address")
         val KEY_USER_NAME = stringPreferencesKey("user_name")
         val KEY_USER_ID = stringPreferencesKey("user_id")
+        val KEY_COMPANY_NAME = stringPreferencesKey("company_name")
+        val KEY_COMPANY_ADDRESS = stringPreferencesKey("company_address")
+        val KEY_COMPANY_CR_NO = stringPreferencesKey("company_cr_no")
+        val KEY_COMPANY_VAT_NO = stringPreferencesKey("company_vat_no")
+        val KEY_INVOICE_TITLE = stringPreferencesKey("invoice_title")
         val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
+
+        val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+        val KEY_IS_DOMAIN_ADDED = booleanPreferencesKey("is_domain_added")
+        val KEY_IS_CUSTOMER_CREATION_ENABLED = booleanPreferencesKey("is_customer_creation_enabled")
+        val KEY_IS_TOTAL_BILL_DISC_ENABLED = booleanPreferencesKey("is_total_bill_disc_enabled")
+
     }
 
     // Save string

@@ -8,6 +8,7 @@ import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerResponse
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
+import com.joseph.salesorderapp.data.remote.model.SettingsResponse
 import com.joseph.salesorderapp.data.remote.model.UserResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -21,6 +22,9 @@ interface ApiService {
         @Path("slug") slug: String,
         @Body request: LoginRequest
     ): Response<LoginResponse>
+
+    @POST("settings/{slug}")
+    suspend fun downloadSettings(@Path("slug") slug: String): Response<SettingsResponse>
 
     @POST("get-customers/{slug}")
     suspend fun downloadCustomers(@Path("slug") slug: String): Response<CustomerResponse>

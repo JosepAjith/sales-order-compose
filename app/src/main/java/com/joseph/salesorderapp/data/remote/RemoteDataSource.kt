@@ -9,6 +9,7 @@ import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerResponse
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
+import com.joseph.salesorderapp.data.remote.model.SettingsResponse
 import com.joseph.salesorderapp.data.remote.model.UserResponse
 import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.Response
@@ -25,6 +26,11 @@ class RemoteDataSource @Inject constructor(
     suspend fun login(request: LoginRequest): Response<LoginResponse> {
         val slug = getSlug()
         return apiService.login(slug, request)
+    }
+
+    suspend fun downloadSettings(): Response<SettingsResponse> {
+        val slug = getSlug()
+        return apiService.downloadSettings(slug)
     }
 
     suspend fun downloadCustomers(): Response<CustomerResponse> {

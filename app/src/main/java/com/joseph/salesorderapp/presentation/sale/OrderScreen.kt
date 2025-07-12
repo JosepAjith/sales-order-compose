@@ -121,6 +121,18 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                             )
                         )
                     }
+                    if (state.isEnableDiscount) {
+                        OutlinedTextField(
+                            value = state.discount,
+                            onValueChange = viewModel::updateDiscount,
+                            label = { Text("Discount") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
+
 
                     Column(
                         horizontalAlignment = Alignment.End,
@@ -133,7 +145,7 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                         )
                         Text(
                             text = priceFormatter.format(
-                                state.orderItems.sumOf { it.product.sellingPrice * it.quantity }
+                                state.totalAmount
                             ),
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.Bold,

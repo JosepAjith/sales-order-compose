@@ -20,6 +20,7 @@ import com.joseph.salesorderapp.data.remote.model.ProductResponse
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerResponse
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
+import com.joseph.salesorderapp.data.remote.model.SettingsResponse
 import com.joseph.salesorderapp.data.remote.model.UserDataItem
 import com.joseph.salesorderapp.data.remote.model.UserResponse
 import com.joseph.salesorderapp.domain.AppRepository
@@ -64,6 +65,25 @@ class AppRepositoryImpl @Inject constructor(
         try {
             if (context.isNetworkAvailable()) {
                 val response = remoteDataSource.downloadUsers()
+                if (response.isSuccessful) {
+                    emit(Resource.Success(response.body()!!))
+                } else {
+                    emit(Resource.Error("Login failed: ${response.code()}"))
+                }
+            } else {
+                emit(Resource.Error("Check internet connection"))
+            }
+
+        } catch (e: Exception) {
+            emit(Resource.Error("Exception: ${e.localizedMessage}"))
+        }
+    }
+
+    override suspend fun downloadSettings(): Flow<Resource<SettingsResponse>> = flow {
+        emit(Resource.Loading())
+        try {
+            if (context.isNetworkAvailable()) {
+                val response = remoteDataSource.downloadSettings()
                 if (response.isSuccessful) {
                     emit(Resource.Success(response.body()!!))
                 } else {
@@ -258,6 +278,7 @@ class AppRepositoryImpl @Inject constructor(
         selectedCustomer: CustomerEntity?,
         totItems: Int,
         total: Double,
+        discountAmount:Double,
         paymentMode: String,
         userID: String,
     ): Long {
@@ -274,6 +295,7 @@ class AppRepositoryImpl @Inject constructor(
             orderID = orderID,
             totalItems = totItems,
             totalAmount = total,
+            discountAmount =discountAmount ,
             isSynced = false,
             paymentMode = paymentMode,
             orderDate = DateUtils.getCurrentDate(),

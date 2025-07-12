@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
+import com.joseph.salesorderapp.data.local.preferences.AppPreferences
 import com.joseph.salesorderapp.data.remote.model.OrderItemPayload
 import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashBoardViewModel @Inject constructor(
     private val repository: AppRepository,
-    private val uiEventManager: UiEventManager
+    private val uiEventManager: UiEventManager,
+    private val appPreferences: AppPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashBoardState())
@@ -159,6 +161,37 @@ class DashBoardViewModel @Inject constructor(
                     is Resource.Error -> {
                         _uiState.update {
                             it.copy(error = usersResult.message)
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+
+            repository.downloadSettings().collect { settingsResult ->
+                when (settingsResult) {
+
+                    is Resource.Success -> {
+                        if (settingsResult.data?.status == 1) {
+                            val settingsData =
+                                settingsResult.data.data
+
+                            appPreferences.saveBoolean(AppPreferences.KEY_IS_CUSTOMER_CREATION_ENABLED,settingsData?.haveCustomerCreation==1)
+                            appPreferences.saveBoolean(AppPreferences.KEY_IS_TOTAL_BILL_DISC_ENABLED,settingsData?.haveTotalDiscount==1)
+                            appPreferences.saveString(AppPreferences.KEY_COMPANY_NAME,settingsData?.companyName.toString())
+                            appPreferences.saveString(AppPreferences.KEY_COMPANY_ADDRESS,settingsData?.address.toString())
+                            appPreferences.saveString(AppPreferences.KEY_COMPANY_CR_NO,settingsData?.crnNo.toString())
+                            appPreferences.saveString(AppPreferences.KEY_COMPANY_VAT_NO,settingsData?.vatNo.toString())
+                            appPreferences.saveString(AppPreferences.KEY_INVOICE_TITLE,settingsData?.invoiceTitle.toString())
+
+                        } else {
+                            uiEventManager.showToast(settingsResult.data?.message.toString())
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _uiState.update {
+                            it.copy(error = settingsResult.message)
                         }
                     }
 

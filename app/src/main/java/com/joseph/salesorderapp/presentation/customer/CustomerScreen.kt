@@ -47,15 +47,17 @@ fun CustomerScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.onFabClicked() },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Customer",
-                    tint = Color.White
-                )
+            if (state.enableCustomerCreation){
+                FloatingActionButton(
+                    onClick = { viewModel.onFabClicked() },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Customer",
+                        tint = Color.White
+                    )
+                }
             }
         }
     ) { paddingValues ->
