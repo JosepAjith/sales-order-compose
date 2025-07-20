@@ -13,6 +13,7 @@ data class OrderState(
     val selectedProduct: ProductEntity? = null,
     val selectedPaymentMode: String? = null,
     val quantity: String = "",
+    val price:String="0",
     val discount: String = "0",
     val totalAmount:Double = 0.0,
     val orderItems: List<OrderItem> = emptyList(),
@@ -22,4 +23,5 @@ data class OrderState(
     val itemList: List<OrderDetailsEntity> = emptyList(),
 
     val isEnableDiscount:Boolean=false,
+    val isEnablePriceEdit:Boolean=false,
 )

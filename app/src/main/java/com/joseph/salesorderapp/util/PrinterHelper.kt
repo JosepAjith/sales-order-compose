@@ -31,6 +31,7 @@ class PrinterHelper @Inject constructor(
             uiEventManager.showLoader("Printing please wait", true)
 
             val textToPrint = withContext(Dispatchers.IO) {
+                val isEnableHeader = appPreferences.getBoolean(AppPreferences.KEY_IS_PRINT_HEADER_ENABLED).first()
                 val companyName = appPreferences.getString(AppPreferences.KEY_COMPANY_NAME).first()
                 val companyAddress = appPreferences.getString(AppPreferences.KEY_COMPANY_ADDRESS).first()
                 val vatNumber = appPreferences.getString(AppPreferences.KEY_COMPANY_VAT_NO).first()
@@ -41,14 +42,16 @@ class PrinterHelper @Inject constructor(
                 val date = summary.orderDate
                 val time = summary.orderTime
 
-                builder.append("[C]<b>$companyName</b>\n")
-                builder.append("[C]$companyAddress\n")
-                builder.append("[C]CR No: $crNumber\n")
-                builder.append("[C]VAT No: $vatNumber\n")
+                if(isEnableHeader){
+                    builder.append("[C]<b>$companyName</b>\n")
+                    builder.append("[C]$companyAddress\n")
+                    builder.append("[C]CR No: $crNumber\n")
+                    builder.append("[C]VAT No: $vatNumber\n")
 
-                builder.append("\n")
-                builder.append("[C]$invoiceTittle\n")
-                builder.append("[C]--------------------------------\n")
+                    builder.append("\n")
+                    builder.append("[C]$invoiceTittle\n")
+                    builder.append("[C]--------------------------------\n")
+                }
 
                 builder.append("[C]<b>SONO: ${summary.orderID}</b>\n")
                 builder.append("[L]Customer: ${summary.customerName}\n")

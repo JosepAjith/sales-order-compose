@@ -20,6 +20,7 @@ data class OrderDetailsEntity(
     val discount: Double,
     val totalPrice: Double,
     val isSynced: Boolean = false,
+    val isDeleted: Boolean = false,
     val createdAt: String? = null,
     val updatedAt: String? = null
 )

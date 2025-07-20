@@ -18,7 +18,7 @@ data class ProductEntity(
     val description: String = "",
 
     val purchasePrice: Double = 0.0,
-    val sellingPrice: Double = 0.0,
+    var sellingPrice: Double = 0.0,
 
     val stockQty: Int = 0,
     val unit: String = "pcs",

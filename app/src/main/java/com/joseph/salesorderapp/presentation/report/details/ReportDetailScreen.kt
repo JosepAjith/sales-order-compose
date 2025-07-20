@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,6 +67,11 @@ fun ReportDetailScreen(
                 actions = {
                     IconButton(onClick = { viewModel.printReceipt() }) {
                         Icon(Icons.Default.Print, contentDescription = "Print")
+                    }
+                    if (state.orderSummary?.isSynced == false) {
+                        IconButton(onClick = { viewModel.updateDeleteStatus() }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
                     }
                 },
                 windowInsets = WindowInsets(0)

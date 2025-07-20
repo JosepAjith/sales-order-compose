@@ -52,10 +52,10 @@ class OrderViewModel @Inject constructor(
 
     private fun fetchSettings() {
         viewModelScope.launch {
-            val isEnableDiscount =
-                appPreferences.getBoolean(AppPreferences.KEY_IS_TOTAL_BILL_DISC_ENABLED).first()
+            val isEnableDiscount = appPreferences.getBoolean(AppPreferences.KEY_IS_TOTAL_BILL_DISC_ENABLED).first()
+            val isEnablePriceEdit = appPreferences.getBoolean(AppPreferences.KEY_IS_PRICE_EDIT_ENABLED).first()
             _uiState.update {
-                it.copy(isEnableDiscount = isEnableDiscount)
+                it.copy(isEnableDiscount = isEnableDiscount,isEnablePriceEdit=isEnablePriceEdit)
             }
         }
     }
@@ -132,11 +132,17 @@ class OrderViewModel @Inject constructor(
     }
 
     fun selectProduct(product: ProductEntity?) {
-        _uiState.update { it.copy(selectedProduct = product) }
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedProduct = product,
+                price = product?.sellingPrice.toString()
+            )
+        }
         if (product != null) {
             _requestQuantityFocus.value = true
         }
     }
+
 
     fun removeOrderItem(index: Int) {
         viewModelScope.launch {
@@ -162,6 +168,14 @@ class OrderViewModel @Inject constructor(
     fun updateQuantity(quantity: String) {
         _uiState.update { it.copy(quantity = quantity) }
     }
+
+    fun updatePrice(price: String) {
+        _uiState.update { currentState ->
+            val updatedProduct = currentState.selectedProduct?.copy(sellingPrice = price.toDoubleOrNull() ?: 0.0)
+            currentState.copy(selectedProduct = updatedProduct, price = price)
+        }
+    }
+
     fun updateDiscount(discount: String) {
         _uiState.update { it.copy(discount = discount) }
         updateTotal()

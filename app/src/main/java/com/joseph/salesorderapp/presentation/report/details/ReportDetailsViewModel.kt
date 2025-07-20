@@ -96,6 +96,15 @@ class ReportDetailsViewModel @Inject constructor(
         }
     }
 
+    fun updateDeleteStatus(){
+        viewModelScope.launch {
+            repository.updateDeleteStatus(uiState.value.orderSummary?.id?.toLong() ?:0 )
+            repository.updateItemDeleteStatus(uiState.value.orderSummary?.id?.toLong() ?:0 )
+            uiEventManager.showToast("Bill Deleted")
+            uiEventManager.navigateUp()
+        }
+    }
+
     fun printReceipt() {
         viewModelScope.launch {
             try {

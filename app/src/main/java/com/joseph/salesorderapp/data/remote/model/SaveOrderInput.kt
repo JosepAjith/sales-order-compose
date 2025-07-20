@@ -20,7 +20,10 @@ data class SaveOrderInput(
 	val details: List<OrderItemPayload?>? = null,
 
 	@field:SerializedName("customer_master_id")
-	val customerMasterId: Int? = null
+	val customerMasterId: Int? = null,
+
+	@field:SerializedName("discount")
+	val discount: Any? = null,
 )
 
 data class OrderItemPayload(

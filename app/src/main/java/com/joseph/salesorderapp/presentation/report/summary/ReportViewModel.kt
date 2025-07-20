@@ -51,7 +51,7 @@ class ReportViewModel @Inject constructor(
         }
     }
 
-    private fun loadOrders() {
+     fun loadOrders() {
         viewModelScope.launch {
             uiEventManager.showLoader("Loading..", true)
             repository.fetchOrderSummary(

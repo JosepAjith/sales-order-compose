@@ -436,6 +436,13 @@ class AppRepositoryImpl @Inject constructor(
         localDataSource.updateOrderSyncStatus(orderId)
     }
 
+    override suspend fun updateDeleteStatus(orderId: Long) {
+        localDataSource.updateDeleteStatus(orderId)
+    }
+  override suspend fun updateItemDeleteStatus(orderId: Long) {
+        localDataSource.updateItemDeleteStatus(orderId)
+    }
+
     override suspend fun updateOrderItemsSyncStatus(orderId: Long) {
         localDataSource.updateOrderItemsSyncStatus(orderId)
     }

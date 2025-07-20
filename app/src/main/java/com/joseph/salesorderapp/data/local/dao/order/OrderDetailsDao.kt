@@ -31,6 +31,7 @@ interface OrderDetailsDao {
     FROM order_details
     WHERE orderDate BETWEEN :fromDate AND :toDate
       AND (:customerId IS NULL OR customerID = :customerId)
+      AND isDeleted IS 0
     GROUP BY productID
     """
     )
@@ -43,6 +44,9 @@ interface OrderDetailsDao {
 
     @Query("UPDATE order_details SET customerID = :serverID WHERE customerID = :customerID")
     suspend fun updateOrderDetailCustomerID(serverID: Int?, customerID: Int)
+
+    @Query("UPDATE order_details SET isDeleted = 1 WHERE orderId = :orderId")
+    suspend fun updateItemDeleteStatus(orderId: Long)
 
 }
 

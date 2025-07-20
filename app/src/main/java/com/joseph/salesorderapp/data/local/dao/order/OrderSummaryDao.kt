@@ -17,7 +17,7 @@ interface OrderSummaryDao {
     @Query("SELECT * FROM order_summary")
     fun fetchSummary(): Flow<List<OrderSummaryEntity>>
 
-    @Query("SELECT * FROM order_summary WHERE orderDate BETWEEN :fromDate AND :toDate")
+    @Query("SELECT * FROM order_summary WHERE orderDate BETWEEN :fromDate AND :toDate AND isDeleted = 0")
     fun fetchOrderSummary(fromDate: String, toDate: String): Flow<List<OrderSummaryEntity>>
 
     @Query("SELECT * FROM order_summary WHERE id = :orderID LIMIT 1")
@@ -26,7 +26,7 @@ interface OrderSummaryDao {
     @Update
     suspend fun updateOrders(orders: List<OrderSummaryEntity>)
 
-    @Query("SELECT COUNT(*) FROM order_summary WHERE isSynced = 0")
+    @Query("SELECT COUNT(*) FROM order_summary WHERE isSynced = 0 AND isDeleted=0")
     suspend fun getUnsyncedOrdersCount(): Int
 
     @Query("SELECT * FROM order_summary WHERE isSynced = 0")
@@ -34,6 +34,9 @@ interface OrderSummaryDao {
 
     @Query("UPDATE order_summary SET isSynced = 1 WHERE id = :orderId")
     suspend fun updateOrderSynced(orderId: Long)
+
+    @Query("UPDATE order_summary SET isDeleted = 1 WHERE id = :orderId")
+    suspend fun updateDeleteStatus(orderId: Long)
 
     @Query("SELECT MAX(id) FROM order_summary")
     suspend fun getLastOrderId(): Int?

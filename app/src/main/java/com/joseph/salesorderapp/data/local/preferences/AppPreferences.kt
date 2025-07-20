@@ -37,6 +37,8 @@ class AppPreferences @Inject constructor(
         val KEY_IS_DOMAIN_ADDED = booleanPreferencesKey("is_domain_added")
         val KEY_IS_CUSTOMER_CREATION_ENABLED = booleanPreferencesKey("is_customer_creation_enabled")
         val KEY_IS_TOTAL_BILL_DISC_ENABLED = booleanPreferencesKey("is_total_bill_disc_enabled")
+        val KEY_IS_PRINT_HEADER_ENABLED = booleanPreferencesKey("is_print_header_enabled")
+        val KEY_IS_PRICE_EDIT_ENABLED = booleanPreferencesKey("is_price_edit_enabled")
 
     }
 

@@ -78,6 +78,8 @@ interface AppRepository {
     fun fetchSyncPendingCustomer(): Flow<Resource<List<CustomerEntity>>>
 
     suspend fun updateOrderSyncStatus(orderId: Long)
+    suspend fun updateDeleteStatus(orderId: Long)
+    suspend fun updateItemDeleteStatus(orderID: Long)
     suspend fun updateOrderItemsSyncStatus(orderId: Long)
     suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?)
     suspend fun updateOrderCustomerID(serverID: Int?,customerID: Int)

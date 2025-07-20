@@ -35,6 +35,7 @@ import java.text.DecimalFormat
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Divider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +52,10 @@ fun ReportScreen(
     val labelStyle =
         MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
     val totalStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+
+    LaunchedEffect(Unit) {
+        viewModel.loadOrders()
+    }
 
 
     Scaffold(

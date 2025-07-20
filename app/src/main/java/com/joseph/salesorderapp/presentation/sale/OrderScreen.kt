@@ -98,8 +98,35 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(8.dp)
             ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    SearchableDropdown(
+                        items = paymentModes,
+                        selectedItem = state.selectedPaymentMode,
+                        onItemSelected = { viewModel.selectPaymentMode(it) },
+                        onSearchQueryChanged = {},
+                        itemLabel = { it },
+                        label = "Pay Mode",
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (state.isEnableDiscount){
+                        OutlinedTextField(
+                            value = state.discount,
+                            onValueChange = viewModel::updateDiscount,
+                            label = { Text("Discount") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,18 +148,6 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                             )
                         )
                     }
-                    if (state.isEnableDiscount) {
-                        OutlinedTextField(
-                            value = state.discount,
-                            onValueChange = viewModel::updateDiscount,
-                            label = { Text("Discount") },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier
-                                .weight(1f)
-                        )
-                    }
-
 
                     Column(
                         horizontalAlignment = Alignment.End,
@@ -236,23 +251,25 @@ fun OrderScreen(viewModel: OrderViewModel = hiltViewModel()) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
+                    enabled = state.isEnablePriceEdit,
+                    value =state.price,
+                    onValueChange = viewModel::updatePrice,
+                    label = { Text("Price") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier
+                        .weight(1f)
+
+                )
+                OutlinedTextField(
                     value = state.quantity,
+                    singleLine = true,
                     onValueChange = viewModel::updateQuantity,
                     label = { Text("Quantity") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .weight(1f)
                         .focusRequester(quantityFocusRequester)
-                )
-
-                SearchableDropdown(
-                    items = paymentModes,
-                    selectedItem = state.selectedPaymentMode,
-                    onItemSelected = { viewModel.selectPaymentMode(it) },
-                    onSearchQueryChanged = {},
-                    itemLabel = { it },
-                    label = "Pay Mode",
-                    modifier = Modifier.weight(1f)
                 )
             }
             Row(

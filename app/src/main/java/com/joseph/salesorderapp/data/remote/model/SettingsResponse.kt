@@ -43,6 +43,9 @@ data class SettingsData(
 	@field:SerializedName("receipt_enable")
 	val receiptEnable: Int? = null,
 
+	@field:SerializedName("enable_header")
+	val enableHeader: Int? = null,
+
 	@field:SerializedName("id")
 	val id: Int? = null,
 

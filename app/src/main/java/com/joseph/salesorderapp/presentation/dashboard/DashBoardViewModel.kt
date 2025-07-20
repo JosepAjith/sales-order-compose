@@ -178,6 +178,8 @@ class DashBoardViewModel @Inject constructor(
 
                             appPreferences.saveBoolean(AppPreferences.KEY_IS_CUSTOMER_CREATION_ENABLED,settingsData?.haveCustomerCreation==1)
                             appPreferences.saveBoolean(AppPreferences.KEY_IS_TOTAL_BILL_DISC_ENABLED,settingsData?.haveTotalDiscount==1)
+                            appPreferences.saveBoolean(AppPreferences.KEY_IS_PRICE_EDIT_ENABLED,settingsData?.haveProductPriceEdit==1)
+                            appPreferences.saveBoolean(AppPreferences.KEY_IS_PRINT_HEADER_ENABLED,settingsData?.enableHeader==1)
                             appPreferences.saveString(AppPreferences.KEY_COMPANY_NAME,settingsData?.companyName.toString())
                             appPreferences.saveString(AppPreferences.KEY_COMPANY_ADDRESS,settingsData?.address.toString())
                             appPreferences.saveString(AppPreferences.KEY_COMPANY_CR_NO,settingsData?.crnNo.toString())
@@ -270,6 +272,7 @@ class DashBoardViewModel @Inject constructor(
                 customerMasterId = order.customerID,
                 payMode = order.paymentMode,
                 salesMasterId = order.id,
+                discount = order.discountAmount,
                 details = orderItems.map {
                     OrderItemPayload(
                         productMasterId = it.productID,

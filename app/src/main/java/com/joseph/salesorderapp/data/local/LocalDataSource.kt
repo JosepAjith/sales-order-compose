@@ -90,6 +90,9 @@ class LocalDataSource @Inject constructor(
         orderSummaryDao.updateOrderSynced(orderId)
     }
 
+    suspend fun updateDeleteStatus(orderId: Long) {
+        orderSummaryDao.updateDeleteStatus(orderId)
+    }
 
         suspend fun updateOrderCustomerID(serverID:Int?,customerID: Int) {
         orderSummaryDao.updateOrderCustomerID(serverID,customerID)
@@ -102,6 +105,9 @@ class LocalDataSource @Inject constructor(
 
     suspend fun updateOrderItemsSyncStatus(orderId: Long) {
         orderDetailsDao.updateOrderItemsSyncStatus(orderId)
+    }
+    suspend fun updateItemDeleteStatus(orderId: Long) {
+        orderDetailsDao.updateItemDeleteStatus(orderId)
     }
 
     suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?) {
