@@ -219,8 +219,13 @@ class OrderViewModel @Inject constructor(
     }
 
     fun clearState() {
+        val currentState = _uiState.value
         _requestProductFocus.value = true
-        _uiState.value = OrderState()
+
+        _uiState.value = OrderState(
+            isEnableDiscount = currentState.isEnableDiscount,
+            isEnablePriceEdit = currentState.isEnablePriceEdit,
+        )
     }
 
     fun saveOrder() {
@@ -244,7 +249,7 @@ class OrderViewModel @Inject constructor(
                 state.selectedCustomer,
                 userID.toString()
             )
-            uiEventManager.showToast("Oder saved successfully")
+            uiEventManager.showToast("Order saved successfully")
             printReceipt(insertedId)
         }
     }
