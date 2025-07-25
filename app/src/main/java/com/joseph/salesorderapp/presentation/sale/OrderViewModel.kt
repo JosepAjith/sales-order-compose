@@ -4,11 +4,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.CustomerEntity
 import com.joseph.salesorderapp.data.local.entity.ProductEntity
 import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
+import com.joseph.salesorderapp.data.local.entity.order.OrderSummaryEntity
 import com.joseph.salesorderapp.data.local.preferences.AppPreferences
 import com.joseph.salesorderapp.domain.model.OrderItem
 import com.joseph.salesorderapp.domain.AppRepository
@@ -25,6 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val repository: AppRepository,
     private val uiEventManager: UiEventManager,
     private val appPreferences: AppPreferences,
@@ -42,12 +45,58 @@ class OrderViewModel @Inject constructor(
 
     private val _requestQuantityFocus = MutableStateFlow(false)
     val requestQuantityFocus: StateFlow<Boolean> = _requestQuantityFocus
+    var orderId=0
+    var summary: OrderSummaryEntity? = null
 
     init {
+         orderId = savedStateHandle.get<Int>("orderId") ?: 0
         observeCustomerSearch()
         observeProductSearch()
-        fetchNextOrderId()
+        if (orderId ==0){
+            fetchNextOrderId()
+        }else{
+            loadOrderForEdit()
+        }
         fetchSettings()
+    }
+
+    private fun loadOrderForEdit() {
+        viewModelScope.launch {
+            uiEventManager.showLoader("Loading..", true)
+            val summaryResult = repository.fetchOrderSummaryById(orderId).first { it !is Resource.Loading }
+            val detailResult = repository.fetchReportItemList(orderId).first { it !is Resource.Loading }
+
+            if (summaryResult is Resource.Success && detailResult is Resource.Success) {
+                 summary = summaryResult.data
+                val details = detailResult.data ?: emptyList()
+
+                val orderItems = details.map {
+                    val product = ProductEntity(
+                        id = it.productID,
+                        name = it.productName,
+                        productCode = it.productCode,
+                        sellingPrice = it.pricePerUnit
+                    )
+                    OrderItem(product = product, quantity = it.quantity)
+                }
+
+                val customer = _uiState.value.customers.find { it.serverId == summary?.customerID }
+
+                _uiState.update {
+                    it.copy(
+                        isEditMode = true,
+                        nextOrderID = orderId,
+                        orderItems = orderItems,
+                        selectedCustomer = customer,
+                        discount = summary?.discountAmount.toString(),
+                        totalAmount = summary?.totalAmount ?: 0.0,
+                        selectedPaymentMode = summary?.paymentMode
+                    )
+                }
+            }
+
+            uiEventManager.showLoader("", false)
+        }
     }
 
     private fun fetchSettings() {
@@ -151,8 +200,8 @@ class OrderViewModel @Inject constructor(
             }
             _uiState.update { it.copy(orderItems = updatedItems) }
             uiEventManager.showToast("Removed")
+            updateTotal()
         }
-
     }
 
 
@@ -200,7 +249,8 @@ class OrderViewModel @Inject constructor(
             it.copy(
                 orderItems = it.orderItems + newItem,
                 selectedProduct = null,
-                quantity = ""
+                quantity = "",
+                price = ""
             )
         }
 
@@ -233,26 +283,56 @@ class OrderViewModel @Inject constructor(
 
         viewModelScope.launch {
             val userID = appPreferences.getString(AppPreferences.KEY_USER_ID).first()
-            val insertedId: Long = repository.insertOrderSummary(
-                "SO${state.nextOrderID}",
-                state.selectedCustomer,
-                state.orderItems.size,
-                state.totalAmount,
-                state.discount.toDoubleOrNull() ?: 0.0,
-                state.selectedPaymentMode.toString(),
-                userID.toString(),
-            )
 
-            repository.insertOrderDetails(
-                state.orderItems,
-                insertedId,
-                state.selectedCustomer,
-                userID.toString()
-            )
-            uiEventManager.showToast("Order saved successfully")
-            printReceipt(insertedId)
+            val orderId = if (state.isEditMode && state.nextOrderID != null) {
+                summary?.let {
+                    repository.updateOrderSummary(
+                        it.id,
+                        state.nextOrderID.toString(),
+                        state.selectedCustomer,
+                        state.orderItems.size,
+                        state.totalAmount,
+                        state.discount.toDoubleOrNull() ?: 0.0,
+                        state.selectedPaymentMode.toString(),
+                        userID.toString()
+                    )
+                }
+
+                repository.deleteOrderDetails(state.nextOrderID.toLong())
+                repository.insertOrderDetails(
+                    state.orderItems,
+                    state.nextOrderID.toLong(),
+                    state.selectedCustomer,
+                    userID.toString()
+                )
+
+                state.nextOrderID.toLong()
+            } else {
+                val newId = repository.insertOrderSummary(
+                    "SO${state.nextOrderID}",
+                    state.selectedCustomer,
+                    state.orderItems.size,
+                    state.totalAmount,
+                    state.discount.toDoubleOrNull() ?: 0.0,
+                    state.selectedPaymentMode.toString(),
+                    userID.toString(),
+                )
+
+                repository.insertOrderDetails(
+                    state.orderItems,
+                    newId,
+                    state.selectedCustomer,
+                    userID.toString()
+                )
+
+                newId
+            }
+
+            uiEventManager.showToast("Order ${if (state.isEditMode) "updated" else "saved"} successfully")
+            printReceipt(orderId)
         }
     }
+
 
     private fun printReceipt(insertedId: Long) {
         viewModelScope.launch {

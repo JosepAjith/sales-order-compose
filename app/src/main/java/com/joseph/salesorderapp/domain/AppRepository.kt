@@ -52,6 +52,17 @@ interface AppRepository {
         userID: String,
     ): Long
 
+    suspend fun updateOrderSummary(
+        id:Int,
+        orderID: String,
+        selectedCustomer: CustomerEntity?,
+        totItems: Int,
+        total: Double,
+        discountAmount:Double,
+        paymentMode: String,
+        userID: String,
+    )
+
     suspend fun insertCustomer(name: String, phone: String, address: String)
 
     suspend fun insertOrderDetails(
@@ -77,6 +88,7 @@ interface AppRepository {
     suspend fun fetchSyncPendingOrders(): Flow<Resource<List<OrderSummaryEntity>>>
     fun fetchSyncPendingCustomer(): Flow<Resource<List<CustomerEntity>>>
 
+    suspend fun deleteOrderDetails(orderId: Long)
     suspend fun updateOrderSyncStatus(orderId: Long)
     suspend fun updateDeleteStatus(orderId: Long)
     suspend fun updateItemDeleteStatus(orderID: Long)

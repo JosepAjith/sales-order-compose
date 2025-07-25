@@ -58,6 +58,10 @@ class LocalDataSource @Inject constructor(
         return orderSummaryDao.insertOrder(orderSummary)
     }
 
+    suspend fun updateOrderSummary(orderSummary: OrderSummaryEntity) {
+         orderSummaryDao.updateOrderSummary(orderSummary)
+    }
+
     suspend fun insertOrderDetails(orderDetails: List<OrderDetailsEntity>) {
         orderDetailsDao.insertOrderItems(orderDetails)
     }
@@ -94,24 +98,29 @@ class LocalDataSource @Inject constructor(
         orderSummaryDao.updateDeleteStatus(orderId)
     }
 
-        suspend fun updateOrderCustomerID(serverID:Int?,customerID: Int) {
-        orderSummaryDao.updateOrderCustomerID(serverID,customerID)
+    suspend fun updateOrderCustomerID(serverID: Int?, customerID: Int) {
+        orderSummaryDao.updateOrderCustomerID(serverID, customerID)
     }
 
-    suspend fun updateOrderDetailCustomerID(serverID:Int?,customerID: Int) {
-        orderDetailsDao.updateOrderDetailCustomerID(serverID,customerID)
+    suspend fun updateOrderDetailCustomerID(serverID: Int?, customerID: Int) {
+        orderDetailsDao.updateOrderDetailCustomerID(serverID, customerID)
     }
 
 
     suspend fun updateOrderItemsSyncStatus(orderId: Long) {
         orderDetailsDao.updateOrderItemsSyncStatus(orderId)
     }
+
+    suspend fun deleteOrderDetails(orderId: Long) {
+        orderDetailsDao.deleteOrderDetails(orderId)
+    }
+
     suspend fun updateItemDeleteStatus(orderId: Long) {
         orderDetailsDao.updateItemDeleteStatus(orderId)
     }
 
     suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?) {
-        customerDao.updateCustomerSynced(customerID,serverID)
+        customerDao.updateCustomerSynced(customerID, serverID)
     }
 
     fun fetchSyncPendingCustomer(): Flow<List<CustomerEntity>> {
@@ -127,7 +136,7 @@ class LocalDataSource @Inject constructor(
         toDate: String,
         customerID: Int?,
     ): Flow<List<ItemWiseReport>> {
-        return orderDetailsDao.fetchItemWiseReport(fromDate, toDate,customerID)
+        return orderDetailsDao.fetchItemWiseReport(fromDate, toDate, customerID)
     }
 
     suspend fun fetchLastOrderNo(): Int? {

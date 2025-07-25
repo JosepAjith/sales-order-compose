@@ -278,7 +278,7 @@ class AppRepositoryImpl @Inject constructor(
         selectedCustomer: CustomerEntity?,
         totItems: Int,
         total: Double,
-        discountAmount:Double,
+        discountAmount: Double,
         paymentMode: String,
         userID: String,
     ): Long {
@@ -290,12 +290,12 @@ class AppRepositoryImpl @Inject constructor(
 
         val orderSummary = OrderSummaryEntity(
             customerName = selectedCustomer?.name.toString(),
-            customerID =customerID,
+            customerID = customerID,
             userID = userID.toIntOrNull() ?: 0,
             orderID = orderID,
             totalItems = totItems,
             totalAmount = total,
-            discountAmount =discountAmount ,
+            discountAmount = discountAmount,
             isSynced = false,
             paymentMode = paymentMode,
             orderDate = DateUtils.getCurrentDate(),
@@ -306,6 +306,44 @@ class AppRepositoryImpl @Inject constructor(
 
         return localDataSource.insertOrderSummary(orderSummary)
     }
+
+
+    override suspend fun updateOrderSummary(
+        id: Int,
+        orderID: String,
+        selectedCustomer: CustomerEntity?,
+        totItems: Int,
+        total: Double,
+        discountAmount: Double,
+        paymentMode: String,
+        userID: String
+    ) {
+        val customerID = if (selectedCustomer?.serverId != 0) {
+            selectedCustomer?.serverId ?: 0
+        } else {
+            selectedCustomer.id ?: 0
+        }
+
+        val orderSummary = OrderSummaryEntity(
+            id = id,
+            customerName = selectedCustomer?.name.toString(),
+            customerID = customerID,
+            userID = userID.toIntOrNull() ?: 0,
+            orderID = "SO$orderID",
+            totalItems = totItems,
+            totalAmount = total,
+            discountAmount = discountAmount,
+            isSynced = false,
+            paymentMode = paymentMode,
+            orderDate = DateUtils.getCurrentDate(),
+            orderTime = DateUtils.getCurrentTimeOnly(),
+            updatedAt = DateUtils.getCurrentTimestamp()
+        )
+
+        localDataSource.updateOrderSummary(orderSummary)
+    }
+
+
 
     override suspend fun insertCustomer(
         name: String, phone: String, address: String
@@ -439,8 +477,13 @@ class AppRepositoryImpl @Inject constructor(
     override suspend fun updateDeleteStatus(orderId: Long) {
         localDataSource.updateDeleteStatus(orderId)
     }
-  override suspend fun updateItemDeleteStatus(orderId: Long) {
+
+    override suspend fun updateItemDeleteStatus(orderId: Long) {
         localDataSource.updateItemDeleteStatus(orderId)
+    }
+
+    override suspend fun deleteOrderDetails(orderId: Long) {
+        localDataSource.deleteOrderDetails(orderId)
     }
 
     override suspend fun updateOrderItemsSyncStatus(orderId: Long) {
@@ -459,15 +502,15 @@ class AppRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateCustomerSyncStatus(customerID: Long, serverID: Int?) {
-        localDataSource.updateCustomerSyncStatus(customerID,serverID)
+        localDataSource.updateCustomerSyncStatus(customerID, serverID)
     }
 
-    override suspend fun updateOrderCustomerID( serverID: Int?,customerID:Int) {
-        localDataSource.updateOrderCustomerID(serverID,customerID)
+    override suspend fun updateOrderCustomerID(serverID: Int?, customerID: Int) {
+        localDataSource.updateOrderCustomerID(serverID, customerID)
     }
 
-    override suspend fun updateOrderDetailCustomerID( serverID: Int?,customerID:Int) {
-        localDataSource.updateOrderDetailCustomerID(serverID,customerID)
+    override suspend fun updateOrderDetailCustomerID(serverID: Int?, customerID: Int) {
+        localDataSource.updateOrderDetailCustomerID(serverID, customerID)
     }
 
 

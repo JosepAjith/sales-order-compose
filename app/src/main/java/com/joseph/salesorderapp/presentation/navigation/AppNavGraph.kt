@@ -118,7 +118,6 @@ fun AppNavGraph(
             composable(Routes.Login.route) { LoginScreen() }
             composable(Routes.Dashboard.route) { DashBoardScreen() }
             composable(Routes.CustomerList.route) { CustomerScreen() }
-            composable(Routes.SaleOrder.route) { OrderScreen() }
             composable(Routes.Report.route) { ReportScreen() }
             composable(Routes.AddCustomer.route) { AddCustomerScreen() }
             composable(Routes.ReportTypeScreen.route) { ReportTypeScreen() }
@@ -129,6 +128,12 @@ fun AppNavGraph(
                 arguments = listOf(navArgument("orderId") { type = NavType.IntType })
             ) {
                 ReportDetailScreen()
+            }
+            composable(
+                Routes.SaleOrder.route,
+                arguments = listOf(navArgument("orderId") { type = NavType.IntType })
+            ) {
+                OrderScreen()
             }
         }
     }

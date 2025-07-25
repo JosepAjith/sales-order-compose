@@ -121,7 +121,7 @@ fun DashBoardScreen(
                         label = "Order Entry",
                         icon = Icons.Default.ListAlt,
                         modifier = Modifier.weight(1f),
-                        onClick = { viewModel.onCardClicked("sale_order") }
+                        onClick = { viewModel.onOrderCardClicked() }
                     )
                     DashboardCard(
                         label = "Reports",

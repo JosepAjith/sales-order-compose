@@ -10,6 +10,7 @@ import com.joseph.salesorderapp.data.remote.model.SaveCustomerInput
 import com.joseph.salesorderapp.data.remote.model.SaveOrderInput
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
+import com.joseph.salesorderapp.presentation.navigation.Routes
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +90,12 @@ class DashBoardViewModel @Inject constructor(
     fun onCardClicked(route: String) {
         viewModelScope.launch {
             uiEventManager.navigate(route = route)
+        }
+    }
+
+    fun onOrderCardClicked(){
+        viewModelScope.launch {
+            uiEventManager.navigate(route = Routes.SaleOrder.createRoute(0))
         }
     }
 

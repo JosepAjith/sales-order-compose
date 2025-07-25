@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,6 +72,9 @@ fun ReportDetailScreen(
                     if (state.orderSummary?.isSynced == false) {
                         IconButton(onClick = { viewModel.updateDeleteStatus() }) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
+                        IconButton(onClick = { viewModel.onEditPress() }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit")
                         }
                     }
                 },

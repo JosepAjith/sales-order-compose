@@ -48,5 +48,9 @@ interface OrderDetailsDao {
     @Query("UPDATE order_details SET isDeleted = 1 WHERE orderId = :orderId")
     suspend fun updateItemDeleteStatus(orderId: Long)
 
+
+    @Query("DELETE FROM order_details WHERE orderId = :orderId")
+    suspend fun deleteOrderDetails(orderId: Long)
+
 }
 

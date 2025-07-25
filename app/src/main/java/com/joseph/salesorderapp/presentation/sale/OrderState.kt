@@ -22,6 +22,7 @@ data class OrderState(
     val orderSummary: OrderSummaryEntity? = null,
     val itemList: List<OrderDetailsEntity> = emptyList(),
 
+    val isEditMode:Boolean=false,
     val isEnableDiscount:Boolean=false,
     val isEnablePriceEdit:Boolean=false,
 )

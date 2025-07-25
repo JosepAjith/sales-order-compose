@@ -14,6 +14,9 @@ interface OrderSummaryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrder(summary: OrderSummaryEntity): Long
 
+    @Update
+    suspend fun updateOrderSummary(summary: OrderSummaryEntity)
+
     @Query("SELECT * FROM order_summary")
     fun fetchSummary(): Flow<List<OrderSummaryEntity>>
 

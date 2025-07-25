@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.joseph.salesorderapp.data.local.entity.order.OrderDetailsEntity
 import com.joseph.salesorderapp.domain.AppRepository
 import com.joseph.salesorderapp.presentation.UiEventManager
+import com.joseph.salesorderapp.presentation.navigation.Routes
 import com.joseph.salesorderapp.util.PrinterHelper
 import com.joseph.salesorderapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -102,6 +103,12 @@ class ReportDetailsViewModel @Inject constructor(
             repository.updateItemDeleteStatus(uiState.value.orderSummary?.id?.toLong() ?:0 )
             uiEventManager.showToast("Bill Deleted")
             uiEventManager.navigateUp()
+        }
+    }
+
+    fun onEditPress(){
+        viewModelScope.launch {
+            uiEventManager.navigate(route = Routes.SaleOrder.createRoute(uiState.value.orderSummary?.id ?:0))
         }
     }
 
